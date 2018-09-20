@@ -1,0 +1,14 @@
+<?php
+
+namespace App\Api\V1\Controllers\Masters;
+
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+
+class ProductController extends Controller
+{
+    public function storeFinishedProduct(Request $request)
+    {
+        
+    }
+}
