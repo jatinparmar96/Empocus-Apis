@@ -54,6 +54,11 @@ $api->version('v1', function (Router $api) {
         
         //Unit Of Measurement
         $api->post('addUom','App\\Api\\V1\\Controllers\\Masters\\UnitOfMeasurementController@addUOM');
+        $api->get('getUom','App\\Api\\V1\\Controllers\\Masters\\UnitOfMeasurementController@getUOM');
+        
+
+        //Store Raw Products
+        $api->post('storeRawProduct','App\\Api\\V1\\Controllers\\Masters\\ProductController@storeRawProduct');
 
         /*Menus table*/
         $api->get('menu', 'App\\Api\\V1\\Controllers\\MenuController@index');
