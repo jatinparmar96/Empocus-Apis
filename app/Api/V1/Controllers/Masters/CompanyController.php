@@ -22,25 +22,32 @@ class CompanyController extends Controller
 		$limit = 10;
 		return Company::paginate($limit);
 	}
+	public static function getCurrentCompany()
+	{
+		$token = JWTAuth::getPayload()->toArray();
+		$current_company_id = $token['company_id']['id'];
 	
+		return $current_company_id;
+	}
 	public function storeOtherDetails(Request $request)
 	{
 		
 		$token = JWTAuth::decode(JWTAuth::getToken());
 		$current_company_id = $token['company_id']['id'];
 		$company= Company::find($current_company_id);
-		$company->pan_number = Input::get('company_pan_number');
-		$company->logo = Input::get('company_logo');
-		$company->tan_number = Input::get('company_tan_number');
-		$company->ecc_number = Input::get('company_ecc_number');
-		$company->division_code = Input::get('company_division_code');
-		$company->cin_number = Input::get('company_cin_number');
+		$company->pan_number = $request->get('company_pan_number');
+		$company->logo = $request->get('company_logo');
+		$company->tan_number = $request->get('company_tan_number');
+		$company->ecc_number = $request->get('company_ecc_number');
+		$company->division_code = $request->get('company_division_code');
+		$company->cin_number = $request->get('company_cin_number');
 	
 		try{
 			$company->save();
 			$branch = new Branch();
+			$branch->name = "Head Office";
 			$branch->company_id = $company->id;
-			$branch->gst_no = Input::get('company_gst_number');
+			$branch->gst_number = $request->get('company_gst_number');
 			$branch->save();
 		}
 		catch(\Exception $e)
@@ -92,18 +99,30 @@ class CompanyController extends Controller
     	$user = JWTAuth::parseToken()->toUser();
 		$company = new Company();
 		$company->user_id= $user->id;
-		$company->name = Input::get('company_name');
-		$company->display_name = Input::get('company_display_name');
-		$company->fax = Input::get('company_fax_number');
-		$company->website = Input::get('company_website');
+		$company->name = $request->get('company_name');
+		$company->display_name = $request->get('company_display_name');
+		$company->fax = $request->get('company_fax_number');
+		$company->website = $request->get('company_website');
 		try{
 		$company->save();
+		$company_array['id']= $company->id;
+		$company_array['display_name']= $company->display_name;
+		$user_payload = [
+            'id' => (int)$user['id'],
+            'name' => $user['display_name'],
+            'company_id'=>$company_array
+		];
+		$token = JWTAuth::fromUser($user,$user_payload);
 		}
 		catch(\Exception $e) 
 		{
 				return $e->getMessage();
 		}
-		return ($company->id);
+		return response()
+				->json([
+					'token'=>$token,
+					'company_id'=>$company->id
+				]);
 		
 		
 		// return Company::create([

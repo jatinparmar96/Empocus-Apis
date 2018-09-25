@@ -13,48 +13,48 @@ use App\Model\Address;
 
 class ChartAccountsMaster extends Controller
 {
-  public function storeChartOfAccounts()
+  public function storeChartOfAccounts(Request $request)
   {
     $token = JWTAuth::decode(JWTAuth::getToken());
     $user = JWTAuth::parseToken()->toUser();
     $current_company_id = $token['company_id']['id'];
     $account = new ChartOfAccount();
     $account->company_id = $current_company_id;
-    $account->ca_company_name=Input::get('ca_company_name');
-    $account->ca_company_display_name=Input::get('ca_company_display_name');
-    $account->ca_category=Input::get('ca_category');
-    $account->ca_code = Input::get('ca_code');
-    $account->ca_opening_amount=Input::get('ca_opening_amount');
-    $account->ca_opening_type=Input::get('ca_opening_type');
-    $account->ca_first_name=Input::get('ca_first_name');
-    $account->ca_last_name=Input::get('ca_last_name');
-    $account->ca_mobile_number=Input::get('ca_mobile_number');
-    $account->ca_fax=Input::get('ca_fax');
-    $account->ca_email=Input::get('ca_email');
-    $account->ca_website=Input::get('ca_website');
-    $account->ca_designation=Input::get('ca_designation');
-    $account->ca_branch=Input::get('ca_branch');
-    $account->ca_pan=Input::get('ca_pan');
-    $account->ca_gstn=Input::get('ca_gstn');
-    $account->ca_tan=Input::get('ca_tan');
-    $account->ca_commodity=Input::get('ca_commodity');
-    $account->ca_ecc_no=Input::get('ca_ecc_no');
-    $account->ca_rc_no=Input::get('ca_rc_no');
-    $account->ca_division=Input::get('ca_division');
-    $account->ca_range=Input::get('ca_range');
-    $account->ca_commissionerate=Input::get('ca_commissionerate');
-    $account->ca_tin_no=Input::get('ca_tin_no');
-    $account->ca_date_opened=Input::get('ca_date_opened');
-    $account->ca_cst_no=Input::get('ca_cst_no');
+    $account->ca_company_name=$request->get('ca_company_name');
+    $account->ca_company_display_name=$request->get('ca_company_display_name');
+    $account->ca_category=$request->get('ca_category');
+    $account->ca_code = $request->get('ca_code');
+    $account->ca_opening_amount=$request->get('ca_opening_amount');
+    $account->ca_opening_type=$request->get('ca_opening_type');
+    $account->ca_first_name=$request->get('ca_first_name');
+    $account->ca_last_name=$request->get('ca_last_name');
+    $account->ca_mobile_number=$request->get('ca_mobile_number');
+    $account->ca_fax=$request->get('ca_fax');
+    $account->ca_email=$request->get('ca_email');
+    $account->ca_website=$request->get('ca_website');
+    $account->ca_designation=$request->get('ca_designation');
+    $account->ca_branch=$request->get('ca_branch');
+    $account->ca_pan=$request->get('ca_pan');
+    $account->ca_gstn=$request->get('ca_gstn');
+    $account->ca_tan=$request->get('ca_tan');
+    $account->ca_commodity=$request->get('ca_commodity');
+    $account->ca_ecc_no=$request->get('ca_ecc_no');
+    $account->ca_rc_no=$request->get('ca_rc_no');
+    $account->ca_division=$request->get('ca_division');
+    $account->ca_range=$request->get('ca_range');
+    $account->ca_commissionerate=$request->get('ca_commissionerate');
+    $account->ca_tin_no=$request->get('ca_tin_no');
+    $account->ca_date_opened=$request->get('ca_date_opened');
+    $account->ca_cst_no=$request->get('ca_cst_no');
     $address = new Address();
     $address->type = 'ChartOfAccounts';
-    $address->block_no = Input::get('ca_address_building');
-    $address->road_name = Input::get('ca_address_road_name');
-    $address->landmark = Input::get('ca_address_landmark');
-    $address->pincode = Input::get('ca_address_pincode');
-    $address->country = Input::get('ca_address_country');
-    $address->state = Input::get('ca_address_state');
-    $address->city = Input::get('ca_address_city');    
+    $address->block_no = $request->get('ca_address_building');
+    $address->road_name = $request->get('ca_address_road_name');
+    $address->landmark = $request->get('ca_address_landmark');
+    $address->pincode = $request->get('ca_address_pincode');
+    $address->country = $request->get('ca_address_country');
+    $address->state = $request->get('ca_address_state');
+    $address->city = $request->get('ca_address_city');    
     try{
         $address->save();
         $account->address_id = $address->id;
@@ -68,5 +68,21 @@ class ChartAccountsMaster extends Controller
 			->json([
 				'status' => true
 				]);
+  }
+  public function getChartOfAccounts(Request $request)
+  {
+        $current_company_id = CompanyController::getCurrentCompany();
+        $coa= ChartOfAccount::where('company_id',$current_company_id)->get();
+        $address = [];
+        foreach ($coa as $chart)
+        {
+            array_push($address,Address::where('id',$chart->address_id)->first());
+        }
+        return response()
+        ->json([
+            'status'=>true,
+            'chartOfAccounts'=>$coa,
+            'address'=>$address
+        ]);
   }
 }

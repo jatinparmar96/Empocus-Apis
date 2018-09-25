@@ -64,4 +64,16 @@ class ProductController extends Controller
         }
 
     }
+    public function getRawProducts()
+    {
+        $token = JWTAuth::getPayload()->toArray();
+        $user = JWTAuth::parseToken()->toUser();
+        $current_company_id= $token['company_id']['id'];
+        $raw_products = RawProduct::where('company_id',$current_company_id)->get();
+        return response()
+                ->json([
+                    'raw_products'=>$raw_products,
+                    'status'=>true
+                ]);
+    }
 }

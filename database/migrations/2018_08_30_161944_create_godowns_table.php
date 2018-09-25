@@ -17,14 +17,8 @@ class CreateGodownsTable extends Migration
             $table->increments('id');
             $table->integer('company_id');
             $table->string('name');
-            $table->string('godown_code');
-            $table->string('block_no');
-            $table->string('road_name');
-            $table->string('landmark');
-            $table->string('city');
-            $table->string('state');
-            $table->string('country');
-            $table->string('pincode');
+            $table->string('code');
+            $table->integer('address_id')->nullable();
             $table->timestamps();
         });
     }

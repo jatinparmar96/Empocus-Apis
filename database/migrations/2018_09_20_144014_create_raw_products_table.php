@@ -27,7 +27,6 @@ class CreateRawProductsTable extends Migration
             $table->string('store_location');
             $table->integer('opening_stock');
             $table->double('opening_amount',8,2);
-            
             $table->string('product_rate_pick');
             $table->double('product_purchase_rate',8,2);
             $table->double('mrp_rate',8,2);
@@ -36,8 +35,7 @@ class CreateRawProductsTable extends Migration
             $table->integer('max_level');
             $table->integer('min_level');
             $table->integer('reorder_level');
-            $table->text('description');
-        
+            $table->text('description');      
             $table->timestamps();
         });
     }

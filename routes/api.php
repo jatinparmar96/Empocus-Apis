@@ -48,10 +48,23 @@ $api->version('v1', function (Router $api) {
         $api->post('save_token', 'App\\Api\\V1\\Controllers\\Authentication\\LoginController@save_token');
         //Chart of Accounts
         $api->post('chartOfAccounts','App\\Api\\V1\\Controllers\\Masters\\ChartAccountsMaster@storeChartOfAccounts');
-        
+        $api->get('getChartOfAccounts','App\\Api\\V1\\Controllers\\Masters\\ChartAccountsMaster@getChartOfAccounts');
+
+
+        //Godown
+        $api->post('addGodown','App\\Api\\V1\\Controllers\\Masters\\GodownMasterController@storeGodown');
+        $api->get('getGodowns','App\\Api\\V1\\Controllers\\Masters\\GodownMasterController@getGodowns');
+
+        //Bank
+        $api->post('addBank','App\\Api\\V1\\Controllers\\Masters\\BankMasterController@storeBank');
+        $api->get('getBanks','App\\Api\\V1\\Controllers\\Masters\\BankMasterController@getBanks');
+
         //Branch
+        $api->post('addHeadBranch','App\\Api\\V1\\Controllers\\Masters\\BranchController@storeHeadBranch');
         $api->post('addBranch','App\\Api\\V1\\Controllers\\Masters\\BranchController@storeBranch');
-        
+        $api->get('getBranches','App\\Api\\V1\\Controllers\\Masters\\BranchController@getBranches');
+
+
         //Unit Of Measurement
         $api->post('addUom','App\\Api\\V1\\Controllers\\Masters\\UnitOfMeasurementController@addUOM');
         $api->get('getUom','App\\Api\\V1\\Controllers\\Masters\\UnitOfMeasurementController@getUOM');
@@ -59,6 +72,7 @@ $api->version('v1', function (Router $api) {
 
         //Store Raw Products
         $api->post('storeRawProduct','App\\Api\\V1\\Controllers\\Masters\\ProductController@storeRawProduct');
+        $api->get('getRawProducts','App\\Api\\V1\\Controllers\\Masters\\ProductController@getRawProducts');
 
         /*Menus table*/
         $api->get('menu', 'App\\Api\\V1\\Controllers\\MenuController@index');

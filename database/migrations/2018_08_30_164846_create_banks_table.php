@@ -16,11 +16,10 @@ class CreateBanksTable extends Migration
         Schema::create('banks', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('company_id');
-            $table->integer('branch_id');
             $table->string('name');
             $table->string('account_no');
             $table->string('ifsc_code');
-            $table->string('address');
+            $table->string('branch');
             $table->timestamps();
         });
     }
