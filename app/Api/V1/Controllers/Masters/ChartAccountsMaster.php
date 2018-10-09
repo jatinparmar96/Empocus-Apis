@@ -118,7 +118,6 @@ class ChartAccountsMaster extends Controller
                      "ca_first_name"=>"ca.ca_first_name",
                      "ca_last_name"=>"ca.ca_last_name",
                      "ca_mobile_number"=>"ca.ca_mobile_number",
-                     "ca_fax"=>"ca.ca_fax",
                      "ca_email"=>"ca.ca_email",
                      "ca_website"=>"ca.ca_website",
                      "ca_designation"=>"ca.ca_designation",

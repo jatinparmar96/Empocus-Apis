@@ -113,7 +113,6 @@ class CompanyController extends Controller
 		$company->user_id= $user->id;
 		$company->name = $request->get('company_name');
 		$company->display_name = $request->get('company_display_name');
-		$company->fax = $request->get('company_fax_number');
 		$company->website = $request->get('company_website');
 		$company->pan_number = $request->get('company_pan_number');
 		$company->logo = $request->get('company_logo');
