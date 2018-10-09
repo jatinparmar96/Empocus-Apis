@@ -6,35 +6,172 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Model\Bank;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Api\V1\Controllers\Authentication\TokenController;
+use Illuminate\Support\Facades\DB;
 
 class BankMasterController extends Controller
 {
-    public function storeBank(Request $request)
+    public function form(Request $request,$type='',$type_id=0)
     {
-        $token = JWTAuth::getPayload()->toArray();
-        $current_company_id= $token['company_id']['id'];
-        $bank = new Bank();
-        $bank->company_id= $current_company_id;
-        $bank->name = $request->get('bank_name');
-        $bank->account_no = $request->get('bank_account_number');
-        $bank->ifsc_code = $request->get('bank_ifsc_code');
-        $bank->branch = $request->get('bank_branch');
-        $bank->save();
-        return response()
-                ->json([
-                    'status'=>true
-                ]);
+        // If Company Id is non zero Function is called from wizard
+        // Else the request is coming from a form in that case return a json response
+        $status = true;
+        $user = TokenController::getUser();
+        $current_company_id = TokenController::getCompanyId();
+        $id = $request->get('id');
+        if($id == 'new')
+        {
+            $count = Bank::where('bank_name',$request->get('bank_name'))
+                                ->where('account_name',$request->get('account_name'))
+                                ->where('company_id',$current_company_id)
+                                ->count();
+            if($count>0)
+            {  
+                $status = false;
+                $message = 'Kindly Fill up the form Correctly !!';
+                $error['bank']= 'Bank Name with Same account name already Exits';
+            }
+            else
+            {
+                $bank = new Bank();
+                $bank->created_by_id = $user->id;
+                $bank->company_id = $current_company_id;
+                $message = 'Bank Created Successfully';
+            }
+        }
+        else
+        {
+            $bank = Bank::findOrFail($id);
+            $message = 'Bank updated Successfully';
+        }
+        if($status)
+        {
+            if($type==='' && $type_id===0)
+            {
+                $bank->type='Not Defined';
+                $bank->type_id = $type_id;
+            }
+            else
+            {
+                $bank->type = $type;
+                $bank->type_id = $type_id;
+            }
+            $bank->account_name = $request->get('account_name');
+            $bank->bank_name = $request->get('bank_name');
+            $bank->account_no = $request->get('bank_account_number');
+            $bank->ifsc_code = $request->get('bank_ifsc_code');
+            $bank->branch = $request->get('bank_branch');
+            $bank->updated_by_id = $user->id;
+            try
+            {
+                $bank->save();
+            }
+            catch(\Exception $e)
+            {
+                $status = false;
+                $message = 'Something is wrong. Kindly Contact Admin';
+            }
+            return response()->json([
+                        'status'=>$status,
+                        'data'=>$bank,
+                        'message'=>$message
+                    ]);
+        }
+        else
+        {
+            return response()->json([
+                'status'=>$status,
+                'message'=>$message,
+                'error'=>$error
+            ]);
+        }
+      
 
     }
-    public function getBanks(Request $request)
+    public function query()
     {
-        $token = JWTAuth::getPayload()->toArray();
-        $current_company_id= $token['company_id']['id'];
+        $current_company_id=TokenController::getCompanyId();
         $banks = Bank::where('company_id',$current_company_id)->get();
-        return response()
-                ->json([
-                    'banks'=>$banks,
-                    'status'=>true
+        $query = DB::table('banks as ba')
+        ->select('ba.id','ba.type','ba.type_id','ba.account_name','ba.bank_name','ba.account_no','ba.ifsc_code',
+        'ba.branch')
+        ->where('ba.company_id',$current_company_id);
+        return $query;
+    }
+
+    public function TableColumn()
+    {         
+        $TableColumn = array(
+                       "id"=>"ba.id",
+                       "type"=>"ba.type ",
+                       "type_id"=>"ba.type_id",
+                       "account_name"=>"ba.account_name",
+                       "bank_name"=>"ba.bank_name",
+                       "account_no"=>"ba.account_no",
+                       "ifsc_code"=>"ba.ifsc_code",
+                       "branch"=>"ba.branch",
+                       );
+        return $TableColumn;
+    }
+
+    public function sort($query)
+    {
+       $sort = \Request::get('sort');
+       if(!empty($sort))
+       {
+         $TableColumn = $this->TableColumn(); 
+
+         $query = $query->orderBy($TableColumn[key($sort)], $sort[key($sort)]);
+       }
+       else
+            $query = $query->orderBy('ba.account_name','ASC');
+       return $query;       
+    }
+
+    public function search($query)
+    {      
+        $search = \Request::get('search');
+        if(!empty($search))
+        {
+            $TableColumn = $this->TableColumn();
+            foreach($search as $key=>$searchvalue)
+            { 
+                $query =  $query->Where($TableColumn[$key], 'LIKE', '%'.$searchvalue.'%');
+            }
+        }
+
+        return $query;
+    }
+
+    //use Helpers;
+    public function index()
+    {
+        $limit = 10;
+        $query = $this->query();
+        $query = $this->search($query);
+        $query = $this->sort($query);
+        $result = $query->paginate($limit);
+        return response()->json([
+                'status' => true,
+                'status_code' => 200,
+                'message' => 'Bank List',
+                'data' => $result
                 ]);
     }
+
+    public function full_list()
+    {
+        $query = $this->query();
+        $query = $this->search($query);
+        $query = $this->sort($query);
+
+        $result = $query->get();
+        return response()->json([
+                'status' => true,
+                'status_code' => 200,
+                'message' => 'Bank Full List',
+                'data' => $result
+                ]);
+    }
+
 }
