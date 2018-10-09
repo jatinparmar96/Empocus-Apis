@@ -18,8 +18,6 @@ class CreateBranchesTable extends Migration
             $table->integer('company_id');
             $table->string('name');
             $table->string('gst_number');
-            $table->integer('address_id')->nullable();
-            $table->integer('bank_id')->nullable();
             $table->string('code')->nullable();
             $table->timestamps();
             $table->int('created_by_id');

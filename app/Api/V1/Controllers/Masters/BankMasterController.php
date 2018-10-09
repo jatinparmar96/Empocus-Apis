@@ -13,7 +13,7 @@ class BankMasterController extends Controller
 {
     public function form(Request $request,$type='',$type_id=0)
     {
-        // If Company Id is non zero Function is called from wizard
+        // If type and Type_Id is non zero Function is called from wizard
         // Else the request is coming from a form in that case return a json response
         $status = true;
         $user = TokenController::getUser();
