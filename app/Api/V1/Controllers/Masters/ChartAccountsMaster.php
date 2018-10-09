@@ -9,71 +9,187 @@ use Illuminate\Support\Facades\Input;
 use JWTAuth;
 use App\Model\ChartOfAccount;
 use App\Model\Address;
-
+use Illuminate\Support\Facades\DB;
+use App\Api\V1\Controllers\Authentication\TokenController;
+use App\Model\CA_Contact;
 
 class ChartAccountsMaster extends Controller
 {
-  public function storeChartOfAccounts(Request $request)
+  public function form(Request $request)
   {
-    $user = JWTAuth::parseToken()->toUser();
-    $current_company_id = CompanyController::getCurrentCompany();
-    $account = new ChartOfAccount();
-    $account->company_id = $current_company_id;
-    $account->ca_company_name=$request->get('ca_company_name');
-    $account->ca_company_display_name=$request->get('ca_company_display_name');
-    $account->ca_category=$request->get('ca_category');
-    $account->ca_code = $request->get('ca_code');
-    $account->ca_opening_amount=$request->get('ca_opening_amount');
-    $account->ca_opening_type=$request->get('ca_opening_type');
-    $account->ca_first_name=$request->get('ca_first_name');
-    $account->ca_last_name=$request->get('ca_last_name');
-    $account->ca_mobile_number=$request->get('ca_mobile_number');
-    $account->ca_fax=$request->get('ca_fax');
-    $account->ca_email=$request->get('ca_email');
-    $account->ca_website=$request->get('ca_website');
-    $account->ca_designation=$request->get('ca_designation');
-    $account->ca_branch=$request->get('ca_branch');
-    $account->ca_pan=$request->get('ca_pan');
-    $account->ca_gstn=$request->get('ca_gstn');
-    $account->ca_tan=$request->get('ca_tan');
-    $account->ca_commodity=$request->get('ca_commodity');
-    $account->ca_ecc_no=$request->get('ca_ecc_no');
-    $account->ca_rc_no=$request->get('ca_rc_no');
-    $account->ca_division=$request->get('ca_division');
-    $account->ca_range=$request->get('ca_range');
-    $account->ca_commissionerate=$request->get('ca_commissionerate');
-    $account->ca_tin_no=$request->get('ca_tin_no');
-    $account->ca_date_opened=$request->get('ca_date_opened');
-    $account->ca_cst_no=$request->get('ca_cst_no');
-    $address = AddressController::storeAddress($request,'ca_','ChartOfAccounts');    
-    try{
-        $account->address_id = $address->id;
-        $account->save();
-        AddressController::updateAddressId($address,$account->id);
-    }
-    catch(\Exception $e)
+    $user = TokenController::getUser();
+    $status = true;
+    $current_company_id = TokenController::getCompanyId();
+    $id = $request->get('id');
+    if($id === 'new')
     {
-        return $e->getMessage();
+        $count = ChartOfAccount::where('ca_company_name',$request->get('ca_company_name'))
+                                ->where('company_id',$current_company_id)
+                                ->count();
+        if($count>0)
+        {  
+            $status = false;
+            $message = 'Kindly Fill up the form Correctly !!';
+            $error['ca_company_name']= 'Company Name already Exits';
+        }
+        else
+        {
+            $account = new ChartOfAccount();
+            $contact = new CA_Contact();
+            $account->created_by_id = $user->id;
+            $message = "Chart Of account record added Successfully !!";
+            $account->company_id = $current_company_id;
+        }
     }
-    return response()
-			->json([
-				'status' => true
-				]);
-  }
-  public function getChartOfAccounts(Request $request)
-  {
-        $current_company_id = CompanyController::getCurrentCompany();
-        $query = DB::table('chart_of_accounts as ca')
-                    ->join('addresses as a','ca.address_id','a.id')
-                    ->select('ca.id','ca.ca_company_display_name','ca.ca_category','ca.ca_code')
-                    ->addSelect('a.landmark','a.city')
-                    ->where('ca.company_id',$current_company_id);
-        $coa = $query->get();
-    
-        return response()
-        ->json([
-            'status'=>true,
-            'data'=>$coa,
+    else
+    {
+        $account = ChartOfAccount::findOrFail($id);
+        $message = "Record updated Successfully";
+    }
+   
+    if($status)
+    {
+        $account->ca_company_name=$request->get('ca_company_name');
+        $account->ca_company_display_name=$request->get('ca_company_display_name');
+        $account->ca_category=$request->get('ca_category');
+        $account->ca_code = $request->get('ca_code');
+        $account->ca_opening_amount=$request->get('ca_opening_amount');
+        $account->ca_opening_type=$request->get('ca_opening_type');
+        $account->ca_website=$request->get('ca_website');
+        $account->ca_pan=$request->get('ca_pan');
+        $account->ca_gstn=$request->get('ca_gstn');
+        $account->ca_tan=$request->get('ca_tan');
+        $account->ca_date_opened = $request->get('ca_date_opened');
+        $account->updated_by_id = $user->id;
+        try
+        {   
+            $account->save();
+            CA_ContactsController::form($request,$account->id);
+            AddressController::storeAddress($request,'ca_','ChartOfAccounts',$account->id);  
+        }
+        catch(\Exception $e)
+        {
+            $status = false;
+            $message= 'Something is wrong';
+        }
+        $account = $this->query()->where('ca.id',$account->id)->first();
+        return response()->json([
+            'status' => $status,
+            'data' => $account,
+            'message'=>$message
+            ]);
+    }
+    else
+    {
+        return response()->json([
+            'status'=>$status,
+            'message'=>$message,
+            'error'=>$error
         ]);
+    }
   }
+  public function query()
+  {
+        $current_company_id = TokenController::getCompanyId();
+        $query = DB::table('chart_of_accounts as ca')
+                    ->leftJoin('addresses as a','ca.id','a.type_id')
+                    ->leftJoin('ca_contacts as co','ca.id','co.ca_company_id')
+                    ->select(
+                    'ca.id','ca.ca_company_name','ca.ca_company_display_name','ca.ca_category','ca.ca_code','ca.ca_opening_amount','ca.ca_opening_type','ca.ca_website','ca.ca_pan','ca.ca_gstn','ca.ca_tan','ca.ca_date_opened'
+                    )
+                    ->addSelect(
+                    'co.ca_contact_first_name','co.ca_contact_last_name','co.ca_contact_mobile_number','co.ca_contact_email','co.ca_contact_designation','co.ca_contact_branch'
+                    )
+					->addSelect('a.block_no','a.road_name','a.landmark','a.country','a.city','a.state','a.pincode')
+                    ->where('ca.company_id',$current_company_id);
+        return $query;
+  }
+
+  public function TableColumn()
+  {         
+      $TableColumn = array(
+                     "id"=>"ca.id",
+                     "ca_company_name"=>"ca.ca_company_name",                       
+                     "ca_company_display_name"=>"ca.ca_company_display_name",
+                     "ca_category"=>"ca.ca_category",
+                     "ca_code"=>"ca.ca_code",
+                     "ca_opening_amount"=>"ca.ca_opening_amount",
+                     "ca_opening_type"=>"ca.ca_opening_type",
+                     "ca_first_name"=>"ca.ca_first_name",
+                     "ca_last_name"=>"ca.ca_last_name",
+                     "ca_mobile_number"=>"ca.ca_mobile_number",
+                     "ca_fax"=>"ca.ca_fax",
+                     "ca_email"=>"ca.ca_email",
+                     "ca_website"=>"ca.ca_website",
+                     "ca_designation"=>"ca.ca_designation",
+                     "ca_branch"=>"ca.ca_branch",
+                     "ca_pan"=>"ca.ca_pan",
+                     "ca_gstn"=>"ca.ca_gstn",
+                     "ca_tan"=>"ca.ca_tan",
+                     "ca_date_opened"=>"ca.ca_date_opened",
+                     "created_by_id"=>"ca.created_by_id",
+                     "updated_by_id"=>"ca.updated_by_id",
+                     );
+      return $TableColumn;
+  }
+
+  public function sort($query)
+  {
+     $sort = \Request::get('sort');
+     if(!empty($sort))
+     {
+       $TableColumn = $this->TableColumn(); 
+
+       $query = $query->orderBy($TableColumn[key($sort)], $sort[key($sort)]);
+     }
+     else
+        $query = $query->orderBy('ca.company_name','ASC');
+     return $query;       
+  }
+
+  public function search($query)
+  {      
+      $search = \Request::get('search');
+      if(!empty($search))
+      {
+          $TableColumn = $this->TableColumn();
+          foreach($search as $key=>$searchvalue)
+          { 
+              $query =  $query->Where($TableColumn[$key], 'LIKE', '%'.$searchvalue.'%');
+          }
+      }
+
+      return $query;
+  }
+
+  //use Helpers;
+  public function index()
+  {
+      $limit = 10;
+      $query = $this->query();
+      $query = $this->search($query);
+      $query = $this->sort($query);
+      $result = $query->paginate($limit);
+      return response()->json([
+              'status' => true,
+              'status_code' => 200,
+              'message' => 'Chart Of Account List',
+              'data' => $result
+              ]);
+  }
+
+  public function full_list()
+  {
+      $query = $this->query();
+      $query = $this->search($query);
+      $query = $this->sort($query);
+      $result = $query->get();
+      return response()->json([
+              'status' => true,
+              'status_code' => 200,
+              'message' => 'Chart Of Account Full List',
+              'data' => $result
+              ]);
+  }
+
 }
