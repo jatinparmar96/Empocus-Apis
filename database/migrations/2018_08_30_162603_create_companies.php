@@ -27,9 +27,11 @@ class CreateCompanies extends Migration
             $table->string('division_code')->nullable();
             $table->string('cin_number')->nullable();
             $table->string('logo')->nullable();
-           
+
             $table->integer('smtp_setting')->nullable();
             $table->timestamps();
+            $table->int('created_by_id');
+            $table->int('updated_by_id');
             
         });
     }

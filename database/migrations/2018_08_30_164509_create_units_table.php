@@ -19,6 +19,8 @@ class CreateUnitsTable extends Migration
             $table->string('name');
             $table->boolean('active_status');
             $table->timestamps();
+            $table->int('created_by_id');
+            $table->int('updated_by_id');
         });
     }
 

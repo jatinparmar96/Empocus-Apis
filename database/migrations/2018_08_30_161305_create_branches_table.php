@@ -13,7 +13,7 @@ class CreateBranchesTable extends Migration
      */
     public function up()
     {
-        Schema::create('branches', function (Blueprint $table) {
+        Schema::create('company_branches', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('company_id');
             $table->string('name');
@@ -22,6 +22,8 @@ class CreateBranchesTable extends Migration
             $table->integer('bank_id')->nullable();
             $table->string('code')->nullable();
             $table->timestamps();
+            $table->int('created_by_id');
+            $table->int('updated_by_id');
         });
     }
 

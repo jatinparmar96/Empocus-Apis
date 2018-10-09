@@ -25,7 +25,6 @@ class CreateChartOfAccountsTable extends Migration
             $table->string('ca_first_name');
             $table->string('ca_last_name');
             $table->string('ca_mobile_number');
-            $table->string('ca_fax');
             $table->string('ca_email');
             $table->string('ca_website');
             $table->string('ca_designation');
@@ -44,6 +43,8 @@ class CreateChartOfAccountsTable extends Migration
             $table->string('ca_date_opened');
             $table->string('ca_cst_no');
             $table->timestamps();
+            $table->int('created_by_id');
+            $table->int('updated_by_id');
         });
     }
 
