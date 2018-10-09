@@ -12,58 +12,63 @@ use JWTAuth ;
 use App\Model\Company;
 use App\Model\Branch;
 use Dingo\Api\Routing\Helpers;
+use App\Api\V1\Controllers\Authentication\TokenController;
 
 class CompanyController extends Controller
 {
 
-    //use Helpers;
-	public function index()
+	//Create Company From Wizard
+	public function createCompanyWizard(Request $request)
 	{
-		$limit = 10;
-		return Company::paginate($limit);
-	}
-	public static function getCurrentCompany()
-	{
-		$token = JWTAuth::getPayload()->toArray();
-		$current_company_id = $token['company_id']['id'];
-	
-		return $current_company_id;
-	}
-	public function storeOtherDetails(Request $request)
-	{
-		$token = JWTAuth::decode(JWTAuth::getToken());
-		$current_company_id = $token['company_id']['id'];
-		$company= Company::find($current_company_id);
-		$company->pan_number = $request->get('company_pan_number');
-		$company->logo = $request->get('company_logo');
-		$company->tan_number = $request->get('company_tan_number');
-		$company->ecc_number = $request->get('company_ecc_number');
-		$company->division_code = $request->get('company_division_code');
-		$company->cin_number = $request->get('company_cin_number');
-	
-		try{
-			$company->save();
-			$branch = new Branch();
-			$branch->name = "Head Office";
-			$branch->company_id = $company->id;
-			$branch->gst_number = $request->get('company_gst_number');
-			$branch->save();
+		$user = TokenController::getUser();
+		$company = $this->store($request);
+
+		// Entry in Branch
+		$branchController = new BranchController();
+		$branch = $branchController->storeBranch($request,$company->id);
+ 		
+		//Entry of Branch in Address
+ 		$address = AddressController::storeAddress($request,'company_','Branch',$branch->id);
+		
+		//Entry of Bank 
+		$bankController = new BankMasterController();
+		$bank = $bankController->storeBank($request,'Branch',$branch->id);
+		
+		$company_array['id']= $company->id;
+		$company_array['display_name']= $company->display_name;
+		$user_payload = [
+            'id' => (int)$user['id'],
+            'name' => $user['display_name'],
+            'company_info'=>$company_array
+		];
+		try
+		{
+			$token = TokenController::createTokenFromPayload($user_payload);
 		}
 		catch(\Exception $e)
 		{
 			return $e->getMessage();
 		}
-	
-		return $company->id;
+		return response()->json([
+					'status'=>true,
+					'token'=>$token
+				]);
 	}
+
+	public function companies_list()
+	{
+		$user= TokenController::getUser();
+		return $user->getCompanies()->get(['id','display_name']);
+	}
+
 	public function setCompany(Request $request)
 	{
-		$user= JWTAuth::parseToken()->toUser();
+		$user= TokenController::getUser();
 		$company = $user->getCompanies()->where('id',$request['company_id'])->first(['id','display_name']);
 		$user_payload = [
             'id' => (int)$user['id'],
             'name' => $user['display_name'],
-            'company_id'=>$company
+            'company_info'=>$company
 		];
 		try {
 			$token = JWTAuth::fromUser($user,$user_payload);
@@ -94,34 +99,39 @@ class CompanyController extends Controller
 
 	public function store(Request $request)
 	{
-	
-    	$user = JWTAuth::parseToken()->toUser();
-		$company = new Company();
+    	$user = TokenController::getUser();
+    	$id = $request->get('id');
+
+    	if($id == 'new')
+    	{
+    		$company = new Company();
+    	}
+    	else
+    	{
+    		$company = Company::findOrFail($id);
+    	}
 		$company->user_id= $user->id;
 		$company->name = $request->get('company_name');
 		$company->display_name = $request->get('company_display_name');
 		$company->fax = $request->get('company_fax_number');
 		$company->website = $request->get('company_website');
-		try{
-		$company->save();
-		$company_array['id']= $company->id;
-		$company_array['display_name']= $company->display_name;
-		$user_payload = [
-            'id' => (int)$user['id'],
-            'name' => $user['display_name'],
-            'company_id'=>$company_array
-		];
-		$token = JWTAuth::fromUser($user,$user_payload);
+		$company->pan_number = $request->get('company_pan_number');
+		$company->logo = $request->get('company_logo');
+		$company->tan_number = $request->get('company_tan_number');
+		$company->ecc_number = $request->get('company_ecc_number');
+		$company->division_code = $request->get('company_division_code');
+		$company->cin_number = $request->get('company_cin_number');
+		try
+		{
+				$company->save();
 		}
 		catch(\Exception $e) 
 		{
 				return $e->getMessage();
 		}
-		return response()
-				->json([
-					'token'=>$token,
-					'company_id'=>$company->id
-				]);
+		return $company;
+		
+		
 		
 		
 		// return Company::create([
@@ -162,7 +172,7 @@ class CompanyController extends Controller
 
     public function update(Request $request, $id)
     {
-    	$user = JWTAuth::parseToken()->toUser();
+    	$user = TokenController::getUser();
     	$company = Company::findOrFail($id);
     	$data = $request->all();
     	$data['updated_by_id'] = $user->id;
@@ -184,3 +194,32 @@ class CompanyController extends Controller
 	}
 
 }
+
+//Unused Functions 
+
+	// public function storeOtherDetails(Request $request)
+	// {
+	// 	$company_id = TokenController::getCompanyId();
+	// 	$company = Company::find($company_id);
+	// 	$company->pan_number = $request->get('company_pan_number');
+	// 	$company->logo = $request->get('company_logo');
+	// 	$company->tan_number = $request->get('company_tan_number');
+	// 	$company->ecc_number = $request->get('company_ecc_number');
+	// 	$company->division_code = $request->get('company_division_code');
+	// 	$company->cin_number = $request->get('company_cin_number');
+	
+	// 	try{
+	// 		$company->save();
+	// 		$branch = new Branch();
+	// 		$branch->name = "Head Office";
+	// 		$branch->company_id = $company->id;
+	// 		$branch->gst_number = $request->get('company_gst_number');
+	// 		$branch->save();
+	// 	}
+	// 	catch(\Exception $e)
+	// 	{
+	// 		return $e->getMessage();
+	// 	}
+	
+	// 	return $company->id;
+	// }
