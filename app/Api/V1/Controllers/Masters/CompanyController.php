@@ -31,7 +31,6 @@ class CompanyController extends Controller
 	}
 	public function storeOtherDetails(Request $request)
 	{
-		
 		$token = JWTAuth::decode(JWTAuth::getToken());
 		$current_company_id = $token['company_id']['id'];
 		$company= Company::find($current_company_id);

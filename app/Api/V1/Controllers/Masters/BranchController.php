@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Input;
 use JWTAuth;
 use App\Model\Branch;
 use App\Model\Address;
+
 class BranchController extends Controller
 {
     public function storeHeadBranch(Request $request)
@@ -16,6 +17,8 @@ class BranchController extends Controller
         $user = JWTAuth::parseToken()->toUser();
         $current_company_id = $token['company_id']['id'];
         $branch = Branch::where('company_id',$current_company_id)->first();
+        
+        $address_id = AddressController::storeAddress();
         $address = new Address();
         $address->type = "Branch";
         $address->type_id= $branch->id;
@@ -46,20 +49,22 @@ class BranchController extends Controller
         $branch->code = $request->get('branch_code');
         $branch->gst_number = $request->get('branch_gst_number');
         $branch->bank_id = $request->get('branch_bank');
-        $branch->save();
-        $address = new Address();
-        $address->type = "Branch";
-        $address->type_id= $branch->id;
-        $address->block_no = $request->get('branch_address_building_name');
-        $address->road_name = $request->get('branch_address_road_name');
-        $address->landmark = $request->get('branch_address_landmark');
-        $address->pincode = $request->get('branch_address_pincode');
-        $address->country = $request->get('branch_address_country');
-        $address->state = $request->get('branch_address_state');
-        $address->city = $request->get('branch_address_city');
-        $address->save();
+        $address = AddressController::storeAddress($request,'branch_','Branch');
+        
+        // $address = new Address();
+        // $address->type = "Branch";
+        // $address->type_id= $branch->id;
+        // $address->block_no = $request->get('branch_address_building_name');
+        // $address->road_name = $request->get('branch_address_road_name');
+        // $address->landmark = $request->get('branch_address_landmark');
+        // $address->pincode = $request->get('branch_address_pincode');
+        // $address->country = $request->get('branch_address_country');
+        // $address->state = $request->get('branch_address_state');
+        // $address->city = $request->get('branch_address_city');
+        // $address->save();
         $branch->address_id = $address->id;
         $branch->save();
+        AddressController::updateAddressId($address,$branch->id);
         return response()
                  ->json([
                     'status'=>true

@@ -15,9 +15,8 @@ class ChartAccountsMaster extends Controller
 {
   public function storeChartOfAccounts(Request $request)
   {
-    $token = JWTAuth::decode(JWTAuth::getToken());
     $user = JWTAuth::parseToken()->toUser();
-    $current_company_id = $token['company_id']['id'];
+    $current_company_id = CompanyController::getCurrentCompany();
     $account = new ChartOfAccount();
     $account->company_id = $current_company_id;
     $account->ca_company_name=$request->get('ca_company_name');
@@ -46,19 +45,11 @@ class ChartAccountsMaster extends Controller
     $account->ca_tin_no=$request->get('ca_tin_no');
     $account->ca_date_opened=$request->get('ca_date_opened');
     $account->ca_cst_no=$request->get('ca_cst_no');
-    $address = new Address();
-    $address->type = 'ChartOfAccounts';
-    $address->block_no = $request->get('ca_address_building');
-    $address->road_name = $request->get('ca_address_road_name');
-    $address->landmark = $request->get('ca_address_landmark');
-    $address->pincode = $request->get('ca_address_pincode');
-    $address->country = $request->get('ca_address_country');
-    $address->state = $request->get('ca_address_state');
-    $address->city = $request->get('ca_address_city');    
+    $address = AddressController::storeAddress($request,'ca_','ChartOfAccounts');    
     try{
-        $address->save();
         $account->address_id = $address->id;
         $account->save();
+        AddressController::updateAddressId($address,$account->id);
     }
     catch(\Exception $e)
     {
@@ -72,17 +63,17 @@ class ChartAccountsMaster extends Controller
   public function getChartOfAccounts(Request $request)
   {
         $current_company_id = CompanyController::getCurrentCompany();
-        $coa= ChartOfAccount::where('company_id',$current_company_id)->get();
-        $address = [];
-        foreach ($coa as $chart)
-        {
-            array_push($address,Address::where('id',$chart->address_id)->first());
-        }
+        $query = DB::table('chart_of_accounts as ca')
+                    ->join('addresses as a','ca.address_id','a.id')
+                    ->select('ca.id','ca.ca_company_display_name','ca.ca_category','ca.ca_code')
+                    ->addSelect('a.landmark','a.city')
+                    ->where('ca.company_id',$current_company_id);
+        $coa = $query->get();
+    
         return response()
         ->json([
             'status'=>true,
-            'chartOfAccounts'=>$coa,
-            'address'=>$address
+            'data'=>$coa,
         ]);
   }
 }

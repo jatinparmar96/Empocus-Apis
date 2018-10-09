@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Model\Godown;
 use App\Model\Address;
+use Illuminate\Support\Facades\DB;
+
 
 class GodownMasterController extends Controller
 {
@@ -41,17 +43,16 @@ class GodownMasterController extends Controller
     public function getGodowns(Request $request)
     {
         $company_id  = CompanyController::getCurrentCompany();
-        $godowns = Godown::where('company_id',$company_id)->get();
-        $address = [];
-        foreach($godowns as $godown)
-        {
-            array_push( $address, Address::where('id',$godown->address_id)->first());
-        }
-        return response()
-                ->json([
+        $query = DB::table('godowns as g')
+					->join('addresses as a', 'g.address_id', '=', 'a.id')
+					->select('g.id', 'g.name', 'g.code')
+					->addSelect('a.landmark','a.city')
+                    ->where('g.company_id','=',$company_id);
+                    
+        $godowns = $query->get();
+        return response()->json([
                     'status'=>true,
-                    'godowns'=>$godowns,
-                    'address'=>$address
+                    'data'=>$godowns,
                 ]);
     }
 }
