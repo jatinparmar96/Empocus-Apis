@@ -32,8 +32,7 @@ class BranchController extends Controller
         $address->save();
         $branch->address_id = $address->id;
         $branch->save();
-        return response()
-        ->json([
+        return response()->json([
            'status'=>true
            ]);
     }
@@ -51,22 +50,11 @@ class BranchController extends Controller
         $branch->bank_id = $request->get('branch_bank');
         $address = AddressController::storeAddress($request,'branch_','Branch');
         
-        // $address = new Address();
-        // $address->type = "Branch";
-        // $address->type_id= $branch->id;
-        // $address->block_no = $request->get('branch_address_building_name');
-        // $address->road_name = $request->get('branch_address_road_name');
-        // $address->landmark = $request->get('branch_address_landmark');
-        // $address->pincode = $request->get('branch_address_pincode');
-        // $address->country = $request->get('branch_address_country');
-        // $address->state = $request->get('branch_address_state');
-        // $address->city = $request->get('branch_address_city');
-        // $address->save();
+        
         $branch->address_id = $address->id;
         $branch->save();
         AddressController::updateAddressId($address,$branch->id);
-        return response()
-                 ->json([
+        return response()->json([
                     'status'=>true
                     ]);
     }
@@ -80,8 +68,7 @@ class BranchController extends Controller
         {
             array_push( $address, Address::where('id',$branch->address_id)->first());
         }
-        return response()
-                ->json([
+        return response()->json([
                     'status'=>true,
                     'branches'=>$branches,
                     'address'=>$address
