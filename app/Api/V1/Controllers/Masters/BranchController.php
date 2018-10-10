@@ -59,7 +59,7 @@ class BranchController extends Controller
 
             if($company_id !== 0)
             {
-                    $branch->name = 'Head Office';
+                $branch->name = 'Head Office';
             }
             else
             {
@@ -67,7 +67,7 @@ class BranchController extends Controller
             }
             $branch->code = $request->get('branch_code');
             $branch->gst_number = $request->get('branch_gst_number');   
-            $branch->updated_by_id =TokenController::getUser()->id;
+            $branch->updated_by_id = TokenController::getUser()->id;
             try
             {
                 $branch->save();

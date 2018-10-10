@@ -113,54 +113,33 @@ class CompanyController extends Controller
 		$company->user_id= $user->id;
 		$company->name = $request->get('company_name');
 		$company->display_name = $request->get('company_display_name');
+		$company->company_email = $request->get('company_email');
 		$company->website = $request->get('company_website');
 		$company->pan_number = $request->get('company_pan_number');
 		$company->logo = $request->get('company_logo');
 		$company->tan_number = $request->get('company_tan_number');
-		$company->ecc_number = $request->get('company_ecc_number');
-		$company->division_code = $request->get('company_division_code');
+		$company->iec_number = $request->get('company_iec_number');
+		$company->epc_number = $request->get('branch_epc_number');
+		$company->ssi_number = $request->get('company_ssi_number');
+		$company->nsic_number = $request->get('branch_nsic_number');
+		$company->udyog_aadhaar = $request->get('company_udyog_aadhaar');
+		$company->tds_number = $request->get('company_tds_number');
 		$company->cin_number = $request->get('company_cin_number');
 		try
 		{
-				$company->save();
+			$company->save();
 		}
 		catch(\Exception $e) 
 		{
-				return $e->getMessage();
+			return $e->getMessage();
 		}
 		return $company;
-		
-		
-		
-		
-		// return Company::create([
-		// 	"userlevel_alias"=>$request->get('userlevel_alias'),
-		// 	"name"=>$request->get('name'),
-		// 	"email"=>$request->get('email'),
-		// 	"company_type"=>$request->get('company_type'),
-		// 	"website"=>$request->get('website'),
-		// 	"logo"=>$request->get('logo'),
-		// 	"employee_count"=>$request->get('employee_count'),
-		// 	"address"=>$request->get('address'),
-		// 	"city"=>$request->get('city'),
-		// 	"state_id"=>$request->get('state_id'),
-		// 	"country_id"=>$request->get('country_id'),
-		// 	"pincode"=>$request->get('pincode'),
-		// 	"phone1"=>$request->get('phone1'),
-		// 	"phone2"=>$request->get('phone2'),
-		// 	"description"=>$request->get('description'),
-		// 	"founded_year"=>$request->get('founded_year'),
-		// 	"expiry_date"=>$request->get('expiry_date'),
-		// 	"status"=>$request->get('status'),
-
-		// 	"inserted_by_id"=>$user->id,
-		// 	"updated_by_id"=>$user->id
-		// 	]);
 	}
 
  	public function show($id)
  	{
- 		try {
+		 try
+		{
             $company = Company::findOrFail($id);
         } 
         catch (\Exception $e) {
@@ -181,44 +160,131 @@ class CompanyController extends Controller
 
 	public function destroy($id)
 	{
-		if(Company::destroy($id)){
-			return response()
-			->json([
+		if(Company::destroy($id))
+		{
+			return response()->json([
 				'status' => 'ok'
 				]);
 		}
-		else{
+		else
+		{
 			throw new NotFoundHttpException('Oops! Company not found.');
 		}
 	}
 
+	public function query()
+ 	{
+        $current_company_id = TokenController::getCompanyId();
+		$query = DB::table('users as u')
+					->Join('companies as co','u.id','co.user_id')
+                    ->select(
+						'u.name','u.display_name','u.email','u.mobile'
+                    )
+                    ->addSelect(
+						'co.name as company_name','co.display_name as company_display_name','co.company_email','co.pan_number','co.website','co.tan_number','co.iec_number','co.cin_number','co.logo','co.smtp_setting','co.created_by_id','co.updated_by_id'
+					);
+        return $query;
+    }
+
+    public function TableColumn()
+  	{         
+    	$TableColumn = array(
+                     "id"=>"ca.id",
+					 "name"=>"u.name",
+					 "display_name"=>"u.display_name",
+					 "email"=>"u.email",
+					 "mobile"=>"u.mobile",
+                     );
+        return $TableColumn;
+    }
+
+    public function sort($query)
+   {
+		$sort = \Request::get('sort');
+		if(!empty($sort))
+		{
+			$TableColumn = $this->TableColumn(); 
+			$query = $query->orderBy($TableColumn[key($sort)], $sort[key($sort)]);
+		}
+		else
+			$query = $query->orderBy('company_name','ASC');
+		return $query;       
+  }
+
+	public function search($query)
+	{      
+		$search = \Request::get('search');
+		if(!empty($search))
+		{
+			$TableColumn = $this->TableColumn();
+			foreach($search as $key=>$searchvalue)
+			{ 
+				$query =  $query->Where($TableColumn[$key], 'LIKE', '%'.$searchvalue.'%');
+			}
+		}
+
+	return $query;
+	}
+
+  //use Helpers;
+	public function index()
+	{
+		$limit = 10;
+		$query = $this->query();
+		$query = $this->search($query);
+		$query = $this->sort($query);
+		$result = $query->paginate($limit);
+		return response()->json([
+				'status' => true,
+				'status_code' => 200,
+				'message' => 'Companies List',
+				'data' => $result
+				]);
+	}
+
+	public function full_list()
+	{
+		$query = $this->query();
+		$query = $this->search($query);
+		$query = $this->sort($query);
+		$result = $query->get();
+		return response()->json([
+				'status' => true,
+				'status_code' => 200,
+				'message' => 'Companies Full List',
+				'data' => $result
+				]);
+	}
+
+
 }
 
-//Unused Functions 
 
-	// public function storeOtherDetails(Request $request)
-	// {
-	// 	$company_id = TokenController::getCompanyId();
-	// 	$company = Company::find($company_id);
-	// 	$company->pan_number = $request->get('company_pan_number');
-	// 	$company->logo = $request->get('company_logo');
-	// 	$company->tan_number = $request->get('company_tan_number');
-	// 	$company->ecc_number = $request->get('company_ecc_number');
-	// 	$company->division_code = $request->get('company_division_code');
-	// 	$company->cin_number = $request->get('company_cin_number');
+//Unused Functions 
+/*
+	public function storeOtherDetails(Request $request)
+	{
+		$company_id = TokenController::getCompanyId();
+		$company = Company::find($company_id);
+		$company->pan_number = $request->get('company_pan_number');
+		$company->logo = $request->get('company_logo');
+		$company->tan_number = $request->get('company_tan_number');
+		$company->ecc_number = $request->get('company_ecc_number');
+		$company->division_code = $request->get('company_division_code');
+		$company->cin_number = $request->get('company_cin_number');
 	
-	// 	try{
-	// 		$company->save();
-	// 		$branch = new Branch();
-	// 		$branch->name = "Head Office";
-	// 		$branch->company_id = $company->id;
-	// 		$branch->gst_number = $request->get('company_gst_number');
-	// 		$branch->save();
-	// 	}
-	// 	catch(\Exception $e)
-	// 	{
-	// 		return $e->getMessage();
-	// 	}
+		try{
+			$company->save();
+			$branch = new Branch();
+			$branch->name = "Head Office";
+			$branch->company_id = $company->id;
+			$branch->gst_number = $request->get('company_gst_number');
+			$branch->save();
+		}
+		catch(\Exception $e)
+		{
+			return $e->getMessage();
+		}
 	
-	// 	return $company->id;
-	// }
+		return $company->id;
+	} */

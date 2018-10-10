@@ -138,7 +138,6 @@ class ChartAccountsMaster extends Controller
      if(!empty($sort))
      {
        $TableColumn = $this->TableColumn(); 
-
        $query = $query->orderBy($TableColumn[key($sort)], $sort[key($sort)]);
      }
      else
