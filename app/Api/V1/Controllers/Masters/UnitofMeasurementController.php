@@ -155,4 +155,16 @@ class UnitofMeasurementController extends Controller
                 ]);
     }
 
+    public function show(Request $request,$id)
+    {
+        $query = $this->query();
+        $result = $query->Where('uom.id', $id)->first(); 
+        return response()->json([
+            'status' => true,
+            'status_code' => 200,
+            'message' => 'UOM',
+            'data' => $result
+            ]);          
+    }
+
 }

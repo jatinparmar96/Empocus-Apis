@@ -71,12 +71,14 @@ $api->version('v1', function (Router $api) {
             $api->post('branch','App\\Api\\V1\\Controllers\\Masters\\BranchController@form');
             $api->get('branch','App\\Api\\V1\\Controllers\\Masters\\BranchController@index');
             $api->get('branch_full_list','App\\Api\\V1\\Controllers\\Masters\\BranchController@full_list');
-
+            $api->get('branch/{id}','App\\Api\\V1\\Controllers\\Masters\\BranchController@show'); 
+           
             //Unit Of Measurement
             $api->post('uom','App\\Api\\V1\\Controllers\\Masters\\UnitofMeasurementController@form');
             $api->get('uom','App\\Api\\V1\\Controllers\\Masters\\UnitofMeasurementController@index');       
             $api->get('uom_full_list','App\\Api\\V1\\Controllers\\Masters\\UnitofMeasurementController@full_list');
-
+            $api->get('uom/{id}','App\\Api\\V1\\Controllers\\Masters\\UnitofMeasurementController@show'); 
+            
             //Store Raw Products
             $api->post('raw_product','App\\Api\\V1\\Controllers\\Masters\\RawProductController@form');
             $api->get('raw_product','App\\Api\\V1\\Controllers\\Masters\\RawProductController@index');

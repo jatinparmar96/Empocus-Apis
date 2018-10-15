@@ -11,13 +11,17 @@ use Illuminate\Support\Facades\DB;
 
 class BankMasterController extends Controller
 {
-    public function form(Request $request,$type='',$type_id=0)
+    public function form(Request $request,$type='',$type_id=0,$company_id = 0)
     {
         // If type and Type_Id is non zero Function is called from wizard
         // Else the request is coming from a form in that case return a json response
         $status = true;
         $user = TokenController::getUser();
-        $current_company_id = TokenController::getCompanyId();
+        $current_company_id = $company_id;
+        if($company_id === 0)
+        {
+            $current_company_id = TokenController::getCompanyId();
+        }
         $id = $request->get('id');
         if($id == 'new')
         {

@@ -53,6 +53,7 @@ class RawProductController extends Controller
             $raw->product_conv_uom = $request->get('raw_product_conv_uom');
             $raw->conv_factor = $request->get('raw_product_conv_factor');
             $raw->batch_type = $request->get('raw_product_batch_type');
+            $raw->trade_name = $request->get('raw_product_trade_name');
             $raw->stock_ledger = $request->get('raw_product_maintain_stock_ledger');
             $raw->product_rate_pick = $request->get('raw_product_rate_pick_from');
             $raw->product_purchase_rate = $request->get('raw_product_purchase_rate');
@@ -62,6 +63,7 @@ class RawProductController extends Controller
             $raw->max_level = $request->get('raw_product_max_level');
             $raw->min_level = $request->get('raw_product_min_level');
             $raw->description = $request->get('raw_product_description');
+            $raw->store_location = $request->get('raw_product_store_location');
             $raw->product_category = $request->get('raw_product_category');
             $raw->product_hsn = $request->get('raw_product_hsn');
             $raw->updated_by_id = $user->id;
@@ -103,7 +105,7 @@ class RawProductController extends Controller
                 ->leftJoin('taxes as t','rp.gst_rate','t.id')
                 ->leftJoin('product_categories as pc','rp.product_category','pc.id')
                 ->select(
-                'rp.id','rp.product_name','rp.product_display_name','rp.product_code','rp.conv_factor','rp.batch_type','rp.stock_ledger','rp.product_rate_pick','rp.product_purchase_rate','rp.mrp_rate','rp.sales_rate','rp.gst_rate','rp.max_level','rp.min_level','rp.product_hsn','rp.description'
+                'rp.id','rp.product_name','rp.product_display_name','rp.product_code','rp.conv_factor','rp.batch_type','rp.stock_ledger','rp.product_rate_pick','rp.product_purchase_rate','rp.mrp_rate','rp.sales_rate','rp.gst_rate','rp.max_level','rp.min_level','rp.product_hsn','rp.description','rp.trade_name','rp.store_location'
                 )
                 ->addSelect('uom1.unit_name')
                 ->addSelect('uom2.unit_name as conversion_uom')

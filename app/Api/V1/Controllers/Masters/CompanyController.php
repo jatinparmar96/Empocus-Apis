@@ -21,18 +21,19 @@ class CompanyController extends Controller
 	public function createCompanyWizard(Request $request)
 	{
 		$user = TokenController::getUser();
-		$company = $this->store($request);
 
+		$company = $this->store($request);
+		
 		// Entry in Branch
 		$branchController = new BranchController();
-		$branch = $branchController->storeBranch($request,$company->id);
+		$branch = $branchController->form($request,$company->id);
  		
 		//Entry of Branch in Address
  		$address = AddressController::storeAddress($request,'company_','Branch',$branch->id);
 		
 		//Entry of Bank 
 		$bankController = new BankMasterController();
-		$bank = $bankController->storeBank($request,'Branch',$branch->id);
+		$bank = $bankController->form($request,'Branch',$branch->id,$company->id);
 		
 		$company_array['id']= $company->id;
 		$company_array['display_name']= $company->display_name;
@@ -55,11 +56,49 @@ class CompanyController extends Controller
 				]);
 	}
 
-	public function companies_list()
+	
+
+	public function store(Request $request)
 	{
-		$user= TokenController::getUser();
-		return $user->getCompanies()->get(['id','display_name']);
+		$user = TokenController::getUser();
+    	$id = $request->get('id');
+		
+    	if($id == 'new')
+    	{
+			$company = new Company();
+			$company->created_by_id = $user->id;
+    	}
+    	else
+    	{
+    		$company = Company::findOrFail($id);
+    	}
+		$company->user_id= $user->id;
+		$company->name = $request->get('company_name');
+		$company->display_name = $request->get('company_display_name');
+		$company->company_email = $request->get('company_email');
+		$company->website = $request->get('company_website');
+		$company->pan_number = $request->get('company_pan_number');
+		$company->logo = $request->get('company_logo');
+		$company->tan_number = $request->get('company_tan_number');
+		$company->iec_number = $request->get('company_iec_number');
+		$company->epc_number = $request->get('branch_epc_number');
+		$company->ssi_number = $request->get('company_ssi_number');
+		$company->nsic_number = $request->get('branch_nsic_number');
+		$company->udyog_aadhaar = $request->get('company_udyog_aadhaar');
+		$company->tds_number = $request->get('company_tds_number');
+		$company->cin_number = $request->get('company_cin_number');
+		$company->updated_by_id = $user->id;
+		try
+		{
+			$company->save();
+		}
+		catch(\Exception $e) 
+		{
+			throw new \Exception($e->getMessage());
+		}
+		return $company;
 	}
+
 
 	public function setCompany(Request $request)
 	{
@@ -96,44 +135,10 @@ class CompanyController extends Controller
 			'token' => $token
 		]);
 	}
-
-	public function store(Request $request)
+	public function companies_list()
 	{
-    	$user = TokenController::getUser();
-    	$id = $request->get('id');
-
-    	if($id == 'new')
-    	{
-    		$company = new Company();
-    	}
-    	else
-    	{
-    		$company = Company::findOrFail($id);
-    	}
-		$company->user_id= $user->id;
-		$company->name = $request->get('company_name');
-		$company->display_name = $request->get('company_display_name');
-		$company->company_email = $request->get('company_email');
-		$company->website = $request->get('company_website');
-		$company->pan_number = $request->get('company_pan_number');
-		$company->logo = $request->get('company_logo');
-		$company->tan_number = $request->get('company_tan_number');
-		$company->iec_number = $request->get('company_iec_number');
-		$company->epc_number = $request->get('branch_epc_number');
-		$company->ssi_number = $request->get('company_ssi_number');
-		$company->nsic_number = $request->get('branch_nsic_number');
-		$company->udyog_aadhaar = $request->get('company_udyog_aadhaar');
-		$company->tds_number = $request->get('company_tds_number');
-		$company->cin_number = $request->get('company_cin_number');
-		try
-		{
-			$company->save();
-		}
-		catch(\Exception $e) 
-		{
-			return $e->getMessage();
-		}
-		return $company;
+		$user= TokenController::getUser();
+		return $user->getCompanies()->get(['id','display_name']);
 	}
 
  	public function show($id)

@@ -18,7 +18,7 @@ class SendDataController extends Controller
 								$status_code = 200, 
 								$message = " ", 
 								$data = " "
-							);
+							)
 	{
 		return response()->json([
                 'status' => $status,

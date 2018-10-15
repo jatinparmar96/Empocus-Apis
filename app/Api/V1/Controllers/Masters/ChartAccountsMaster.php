@@ -70,7 +70,7 @@ class ChartAccountsMaster extends Controller
         catch(\Exception $e)
         {
             $status = false;
-            $message= 'Something is wrong';
+            $message= 'Something is wrong'.$e;
         }
         $account = $this->query()->where('ca.id',$account->id)->first();
         return response()->json([

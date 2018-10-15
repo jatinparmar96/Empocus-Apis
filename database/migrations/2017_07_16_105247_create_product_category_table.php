@@ -14,9 +14,8 @@ class CreateProductCategoryTable extends Migration
     public function up()
     {
         Schema::create('product_categories', function (Blueprint $table) {
-            $table->engine = 'InnoDB';
             $table->increments('id');
-            $table->string('name');
+            $table->string('product_category_name');
             $table->integer('inserted_by_id')->index();
             $table->integer('updated_by_id')->index();
             $table->timestamps();

@@ -55,7 +55,7 @@ class ProductCategoryController extends Controller
             catch(\Exception $e)
             {
                 $status = false;
-                $message = 'Something is wrong. Kindly Contact Admin';
+                $message = 'Something is wrong. Kindly Contact Admin'.$e;
             }
             $category = $this->query()->where('id',$category->id)->first();
             return response()->json([

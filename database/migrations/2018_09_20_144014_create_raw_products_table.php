@@ -20,6 +20,8 @@ class CreateRawProductsTable extends Migration
             $table->string('product_display_name');
             $table->string('product_code');
             $table->integer('product_uom');
+            $table->integer('product_category');
+            $table->string('trade_name');
             $table->integer('product_conv_uom');
             $table->double('conv_factor',8,2);
             $table->boolean('batch_type');
@@ -35,6 +37,7 @@ class CreateRawProductsTable extends Migration
             $table->integer('max_level');
             $table->integer('min_level');
             $table->integer('reorder_level');
+            $table->string('product_hsn');
             $table->text('description');      
             $table->timestamps();
         });

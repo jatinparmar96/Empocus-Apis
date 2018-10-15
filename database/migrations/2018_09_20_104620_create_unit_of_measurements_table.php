@@ -19,8 +19,8 @@ class CreateUnitOfMeasurementsTable extends Migration
             $table->string('unit_name');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-            $table->int('created_by_id');
-            $table->int('updated_by_id');
+            $table->integer('created_by_id');
+            $table->integer('updated_by_id');
         });
     }
 

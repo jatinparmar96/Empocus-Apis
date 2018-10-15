@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateUnitsTable extends Migration
+class CreateCAContactsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,15 @@ class CreateUnitsTable extends Migration
      */
     public function up()
     {
-        Schema::create('units', function (Blueprint $table) {
+        Schema::create('ca_contacts', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('company_id');
-            $table->string('name');
-            $table->boolean('active_status');
+            $table->integer('ca_company_id');
+            $table->string('ca_contact_first_name');
+            $table->string('ca_contact_last_name');
+            $table->string('ca_contact_email');
+            $table->string('ca_contact_mobile_number');
+            $table->string('ca_contact_designation');
+            $table->string('ca_contact_branch');
             $table->timestamps();
             $table->integer('created_by_id');
             $table->integer('updated_by_id');
@@ -31,6 +35,6 @@ class CreateUnitsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('units');
+        Schema::dropIfExists('c_a__contacts');
     }
 }

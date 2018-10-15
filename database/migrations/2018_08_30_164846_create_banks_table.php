@@ -24,8 +24,8 @@ class CreateBanksTable extends Migration
             $table->string('ifsc_code');
             $table->string('branch');
             $table->timestamps();
-            $table->int('created_by_id');
-            $table->int('updated_by_id');
+            $table->integer('created_by_id');
+            $table->integer('updated_by_id');
         });
     }
 

@@ -26,8 +26,8 @@ class CreateAddressesTable extends Migration
             $table->integer('pincode')->nullable();
             $table->string('address_2')->nullable();
             $table->timestamps();
-            $table->int('created_by_id');
-            $table->int('updated_by_id');
+            $table->integer('created_by_id');
+            $table->integer('updated_by_id');
         });
     }
 
