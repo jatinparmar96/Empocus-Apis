@@ -83,7 +83,7 @@ $api->version('v1', function (Router $api) {
             $api->post('raw_product','App\\Api\\V1\\Controllers\\Masters\\RawProductController@form');
             $api->get('raw_product','App\\Api\\V1\\Controllers\\Masters\\RawProductController@index');
             $api->get('raw_product_full_list','App\\Api\\V1\\Controllers\\Masters\\RawProductController@full_list');
-
+            $api->get('raw_product/{id}','App\\Api\\V1\\Controllers\\Masters\\RawProductController@show');
             /* Attachment table*/
             $api->get('attachment', 'App\\Api\\V1\\Controllers\\AttachmentController@index');
             $api->post('attachment', 'App\\Api\\V1\\Controllers\\AttachmentController@store');

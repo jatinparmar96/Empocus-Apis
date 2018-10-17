@@ -25,7 +25,6 @@ class BranchController extends Controller
         $id = $request->get('id');
         if($id === 'new')
         {
-          
             $count = Branch::where('name',$request->get('branch_name'))
                             ->where('company_id',$current_company_id)
                             ->count();
@@ -39,7 +38,6 @@ class BranchController extends Controller
             }
             else
             {
-               
                 $message = 'New Branch created successfully!!';
                 $branch = new Branch();
                 $branch->company_id = $current_company_id;
@@ -51,7 +49,8 @@ class BranchController extends Controller
         {
            
             $message = 'Branch updated successfully!!';
-            $branch = findOrFail($id);
+            $branch = Branch::findOrFail($id);
+
         }
         if($status)
         {
@@ -66,7 +65,8 @@ class BranchController extends Controller
                 $branch->name = $request->get('branch_name');
             }
             $branch->code = $request->get('branch_code');
-            $branch->gst_number = $request->get('branch_gst_number');   
+            $branch->gst_number = $request->get('branch_gst_number');  
+            $branch->is_godown = ($request->get('branch_godown')=='Yes'? true:false); 
             $branch->updated_by_id = TokenController::getUser()->id;
             try
             {
@@ -119,14 +119,16 @@ class BranchController extends Controller
     public function query()
     {
         $current_company_id  = TokenController::getCompanyId();
+       
         $query = DB::table('company_branches as b')
-                    ->join('addresses as a','b.id','a.type_id')
-                    ->join('banks as ba','b.id','ba.type_id')
+                    ->leftjoin('addresses as a','b.id','a.type_id')
+                    ->leftjoin('banks as ba','b.id','ba.type_id')
                     ->select(
-                    'b.id','b.name','b.gst_number','b.code'
+                    'b.id','b.name as branch_name','b.gst_number as branch_gst_number','b.code as branch_code','b.is_godown'
                     )
-					->addSelect('a.block_no','a.road_name','a.landmark','a.country','a.city','a.state','a.pincode')
-                    ->addSelect('ba.id','ba.bank_name','ba.account_name','ba.account_no','ba.ifsc_code')
+                    ->addSelect(DB::raw("IF(b.is_godown = 1,'Yes','No') as branch_godown"))
+					->addSelect('a.id as address_id','a.block_no as branch_address_building','a.road_name as branch_address_road_name','a.landmark as branch_address_landmark','a.country as branch_address_country','a.city as branch_address_city','a.state as branch_address_state','a.pincode as branch_address_pincode')
+                    ->addSelect('ba.id as branch_bank_id','ba.bank_name','ba.account_name','ba.account_no','ba.ifsc_code')
                     ->where('b.company_id',$current_company_id);
         return $query;
     }
@@ -200,5 +202,18 @@ class BranchController extends Controller
                 'message' => 'Branch Full List',
                 'data' => $result
                 ]);
+    }
+    public function show(Request $request,$id)
+    {
+        $query = $this->query();
+        $query = $this->search($query);
+        $query = $this->sort($query);
+        $result = $query->where('b.id',$id)->first();
+        return response()->json([
+            'status' => true,
+            'status_code' => 200,
+            'message' => 'Branch',
+            'data' => $result
+            ]);
     }
 }

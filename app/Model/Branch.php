@@ -6,5 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Branch extends Model
 {
- 	 protected $table = 'company_branches';
+	  protected $table = 'company_branches';
+	  
+	  
+	
 }

@@ -46,26 +46,27 @@ class RawProductController extends Controller
         }
         if($status)
         {
-            $raw->product_name = $request->get('raw_product_name');
-            $raw->product_display_name = $request->get('raw_product_display_name');
-            $raw->product_code = $request->get('raw_product_code');
-            $raw->product_uom = $request->get('raw_product_uom');
-            $raw->product_conv_uom = $request->get('raw_product_conv_uom');
-            $raw->conv_factor = $request->get('raw_product_conv_factor');
-            $raw->batch_type = $request->get('raw_product_batch_type');
-            $raw->trade_name = $request->get('raw_product_trade_name');
-            $raw->stock_ledger = $request->get('raw_product_maintain_stock_ledger');
-            $raw->product_rate_pick = $request->get('raw_product_rate_pick_from');
-            $raw->product_purchase_rate = $request->get('raw_product_purchase_rate');
-            $raw->mrp_rate = $request->get('raw_product_mrp_rate');
-            $raw->sales_rate = $request->get('raw_product_sales_rate');
-            $raw->gst_rate = $request->get('raw_product_gst_slot');
-            $raw->max_level = $request->get('raw_product_max_level');
-            $raw->min_level = $request->get('raw_product_min_level');
-            $raw->description = $request->get('raw_product_description');
-            $raw->store_location = $request->get('raw_product_store_location');
-            $raw->product_category = $request->get('raw_product_category');
-            $raw->product_hsn = $request->get('raw_product_hsn');
+            $raw->product_name = $request->get('product_name');
+            $raw->product_display_name = $request->get('product_display_name');
+            $raw->product_code = $request->get('product_code');
+            $raw->product_uom = $request->get('product_uom');
+            $raw->product_conv_uom = $request->get('product_conv_uom');
+            $raw->product_conv_factor = $request->get('product_conv_factor');
+            $raw->product_batch_type = ($request->get('product_batch_type')=='Yes'? true:false);
+            $raw->product_trade_name = $request->get('product_trade_name');
+            $raw->product_stock_ledger = ($request->get('product_stock_ledger')=='Yes'? true:false);
+            $raw->product_rate_pick = $request->get('product_rate_pick');
+            $raw->product_purchase_rate = $request->get('product_purchase_rate');
+            $raw->product_mrp_rate = $request->get('product_mrp_rate');
+            $raw->product_sales_rate = $request->get('product_sales_rate');
+            $raw->product_gst_rate = $request->get('product_gst_rate');
+            $raw->product_max_level = $request->get('product_max_level');
+            $raw->product_min_level = $request->get('product_min_level');
+            $raw->product_description = $request->get('product_description');
+            $raw->product_store_location = $request->get('product_store_location');
+            $raw->product_category = $request->get('product_category');
+            $raw->product_hsn = $request->get('product_hsn');
+            $raw->product_type = $request->get('product_type');
             $raw->updated_by_id = $user->id;
             try
             {
@@ -97,20 +98,27 @@ class RawProductController extends Controller
 
     public function query()
     {
-
         $current_company_id = TokenController::getCompanyId();
         $query = DB::table('raw_products as rp')
                 ->leftJoin('unit_of_measurements as uom1','rp.product_uom','uom1.id')
                 ->leftJoin('unit_of_measurements as uom2','rp.product_conv_uom','uom2.id')
-                ->leftJoin('taxes as t','rp.gst_rate','t.id')
+                ->leftJoin('taxes as t','rp.product_gst_rate','t.id')
                 ->leftJoin('product_categories as pc','rp.product_category','pc.id')
                 ->select(
-                'rp.id','rp.product_name','rp.product_display_name','rp.product_code','rp.conv_factor','rp.batch_type','rp.stock_ledger','rp.product_rate_pick','rp.product_purchase_rate','rp.mrp_rate','rp.sales_rate','rp.gst_rate','rp.max_level','rp.min_level','rp.product_hsn','rp.description','rp.trade_name','rp.store_location'
+                'rp.id','rp.product_name','rp.product_display_name','rp.product_code',
+                'rp.product_conv_factor','rp.product_batch_type',
+                'rp.product_stock_ledger','rp.product_rate_pick',
+                'rp.product_purchase_rate','rp.product_mrp_rate',
+                'rp.product_sales_rate','rp.product_max_level','rp.product_min_level',
+                'rp.product_hsn','rp.product_description','rp.product_trade_name',
+                'rp.product_store_location','rp.product_type'
                 )
-                ->addSelect('uom1.unit_name')
-                ->addSelect('uom2.unit_name as conversion_uom')
-                ->addSelect('t.tax_name','t.tax_rate')
-                ->addSelect('pc.product_category_name')
+                ->addSelect(DB::raw('IF(rp.product_batch_type = 1,"Yes","No") as product_batch_type'))
+                ->addSelect(DB::raw('IF(rp.product_stock_ledger = 1,"Yes","No") as product_stock_ledger'))
+                ->addSelect('uom1.id as product_uom','uom1.unit_name')
+                ->addSelect('uom2.id as product_conv_uom','uom2.unit_name')
+                ->addSelect('t.id as product_gst_rate','t.tax_name','t.tax_rate')
+                ->addSelect('pc.id as product_category','pc.product_category_name')
                 ->where('rp.company_id',$current_company_id);
         return $query;
     }
@@ -189,6 +197,19 @@ class RawProductController extends Controller
         $query = $this->search($query);
         $query = $this->sort($query);
         $result = $query->get();
+        return response()->json([
+                'status' => true,
+                'status_code' => 200,
+                'message' => 'Raw Product Full List',
+                'data' => $result
+                ]);
+    }
+    public function show(Request $request,$id)
+    {
+        $query = $this->query();
+        $query = $this->search($query);
+        $query = $this->sort($query);
+        $result = $query->where('rp.id',$id)->first();
         return response()->json([
                 'status' => true,
                 'status_code' => 200,
