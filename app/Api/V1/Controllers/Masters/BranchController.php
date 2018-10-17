@@ -38,7 +38,6 @@ class BranchController extends Controller
             }
             else
             {
-
                 $message = 'New Branch created successfully!!';
                 $branch = new Branch();
                 $branch->company_id = $current_company_id;
@@ -128,7 +127,7 @@ class BranchController extends Controller
                     'b.id','b.name as branch_name','b.gst_number as branch_gst_number','b.code as branch_code','b.is_godown'
                     )
                     ->addSelect(DB::raw("IF(b.is_godown = 1,'Yes','No') as branch_godown"))
-					->addSelect('a.id as address_id','a.block_no as branch_address_building','a.road_name as branch_address_road_name','a.landmark as branch_address_landmark','a.country as branch_address_country','a.city as branch_address_city','a.state as branch_address_state','a.pincode as branch_address_pincode')
+					->addSelect('a.id as address_id','a.building as branch_address_building','a.road_name as branch_address_road_name','a.landmark as branch_address_landmark','a.country as branch_address_country','a.city as branch_address_city','a.state as branch_address_state','a.pincode as branch_address_pincode')
                     ->addSelect('ba.id as branch_bank_id','ba.bank_name','ba.account_name','ba.account_no','ba.ifsc_code')
                     ->where('b.company_id',$current_company_id);
         return $query;

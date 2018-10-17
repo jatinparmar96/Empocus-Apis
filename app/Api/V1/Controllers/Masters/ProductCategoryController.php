@@ -156,4 +156,18 @@ class ProductCategoryController extends Controller
                 'data' => $result
                 ]);
     }
+
+    public function show($id)
+    {
+        $query = $this->query();
+        $query = $this->search($query);
+        $query = $this->sort($query);
+        $result = $query->where('pc.id',$id)->first();
+        return response()->json([
+                'status' => true,
+                'status_code' => 200,
+                'message' => 'Product Category List',
+                'data' => $result
+                ]);
+    }
 }

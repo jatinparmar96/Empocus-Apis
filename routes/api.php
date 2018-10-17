@@ -98,7 +98,7 @@ $api->version('v1', function (Router $api) {
             $api->post('product_category','App\\Api\\V1\\Controllers\\Masters\\ProductCategoryController@form');
             $api->get('product_category','App\\Api\\V1\\Controllers\\Masters\\ProductCategoryController@index');
             $api->get('product_category_full_list','App\\Api\\V1\\Controllers\\Masters\\ProductCategoryController@full_list');
-
+            $api->get('product_category/{id}','App\\Api\\V1\\Controllers\\Masters\\ProductCategoryController@show');
             /* Company Operations */
 
 
