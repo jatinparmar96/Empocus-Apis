@@ -62,9 +62,9 @@ class BankMasterController extends Controller
             }
             $bank->account_name = $request->get('account_name');
             $bank->bank_name = $request->get('bank_name');
-            $bank->account_no = $request->get('bank_account_number');
-            $bank->ifsc_code = $request->get('bank_ifsc_code');
-            $bank->branch = $request->get('bank_branch');
+            $bank->account_no = $request->get('account_no');
+            $bank->ifsc_code = $request->get('ifsc_code');
+            $bank->branch = $request->get('branch');
             $bank->updated_by_id = $user->id;
             try
             {
@@ -73,7 +73,7 @@ class BankMasterController extends Controller
             catch(\Exception $e)
             {
                 $status = false;
-                $message = 'Something is wrong. Kindly Contact Admin';
+                $message = 'Something is wrong. Kindly Contact Admin'.$e;
             }
             return response()->json([
                         'status'=>$status,
@@ -177,5 +177,17 @@ class BankMasterController extends Controller
                 'data' => $result
                 ]);
     }
-
+    public function show($id)
+    {
+        $query = $this->query();
+        $query = $this->search($query);
+        $query = $this->sort($query);
+        $result = $query->where('ba.id',$id)->first();
+        return response()->json([
+                'status' => true,
+                'status_code' => 200,
+                'message' => 'Bank',
+                'data' => $result
+                ]);
+    }
 }

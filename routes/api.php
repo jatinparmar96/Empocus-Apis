@@ -67,6 +67,7 @@ $api->version('v1', function (Router $api) {
             $api->post('bank','App\\Api\\V1\\Controllers\\Masters\\BankMasterController@form');
             $api->get('bank','App\\Api\\V1\\Controllers\\Masters\\BankMasterController@index');
             $api->get('bank_full_list','App\\Api\\V1\\Controllers\\Masters\\BankMasterController@full_list');
+            $api->get('bank/{id}','App\\Api\\V1\\Controllers\\Masters\\BankMasterController@show');
 
             //Branch
             $api->post('branch','App\\Api\\V1\\Controllers\\Masters\\BranchController@form');
