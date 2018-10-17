@@ -26,11 +26,20 @@ class ChartAccountsMaster extends Controller
         $count = ChartOfAccount::where('ca_company_name',$request->get('ca_company_name'))
                                 ->where('company_id',$current_company_id)
                                 ->count();
+        $display = ChartOfAccount::where('ca_company_display_name',$request->get('ca_company_display_name'))
+                                ->where('company_id',$current_company_id)
+                                ->count();
         if($count>0)
         {  
             $status = false;
             $message = 'Kindly Fill up the form Correctly !!';
-            $error['ca_company_name']= 'Company Name already Exits';
+            $error['ca_company_name'] = 'Company Name already Exits';
+        }
+        if($display>0)
+        {  
+            $status = false;
+            $message = 'Kindly Fill up the form Correctly !!';
+            $error['ca_company_display_name'] = 'Company with same display name already Exits';
         }
         else
         {
@@ -76,7 +85,7 @@ class ChartAccountsMaster extends Controller
         return response()->json([
             'status' => $status,
             'data' => $account,
-            'message'=>$message
+            'message'=> $message
             ]);
     }
     else
@@ -98,9 +107,9 @@ class ChartAccountsMaster extends Controller
                     'ca.id','ca.ca_company_name','ca.ca_company_display_name','ca.ca_category','ca.ca_code','ca.ca_opening_amount','ca.ca_opening_type','ca.ca_website','ca.ca_pan','ca.ca_gstn','ca.ca_tan','ca.ca_date_opened'
                     )
                     ->addSelect(
-                    'co.ca_contact_first_name','co.ca_contact_last_name','co.ca_contact_mobile_number','co.ca_contact_email','co.ca_contact_designation','co.ca_contact_branch'
+                    'co.id as contact_id','co.ca_contact_first_name','co.ca_contact_last_name','co.ca_contact_mobile_number','co.ca_contact_email','co.ca_contact_designation','co.ca_contact_branch'
                     )
-					->addSelect('a.block_no','a.road_name','a.landmark','a.country','a.city','a.state','a.pincode')
+					->addSelect('a.id as address_id','a.building as ca_address_building','a.road_name as ca_address_road_name','a.landmark as ca_address_landmark','a.pincode as ca_address_pincode','a.city as ca_address_city','a.state as ca_address_state','a.country as ca_address_country')
                     ->where('ca.company_id',$current_company_id);
         return $query;
   }
@@ -186,6 +195,19 @@ class ChartAccountsMaster extends Controller
               'status' => true,
               'status_code' => 200,
               'message' => 'Chart Of Account Full List',
+              'data' => $result
+              ]);
+  }
+  public function show($id)
+  {
+      $query = $this->query();
+      $query = $this->search($query);
+      $query = $this->sort($query);
+      $result = $query->where('ca.id',$id)->first();
+      return response()->json([
+              'status' => true,
+              'status_code' => 200,
+              'message' => 'Chart Of Account',
               'data' => $result
               ]);
   }

@@ -56,6 +56,7 @@ $api->version('v1', function (Router $api) {
             $api->post('coa','App\\Api\\V1\\Controllers\\Masters\\ChartAccountsMaster@form');
             $api->get('coa','App\\Api\\V1\\Controllers\\Masters\\ChartAccountsMaster@index');
             $api->get('coa_full_list','App\\Api\\V1\\Controllers\\Masters\\ChartAccountsMaster@full_list');
+            $api->get('coa/{id}','App\\Api\\V1\\Controllers\\Masters\\ChartAccountsMaster@show');
 
             //Godown
             $api->post('godown','App\\Api\\V1\\Controllers\\Masters\\GodownMasterController@form');

@@ -26,7 +26,7 @@ class AddressController extends Controller
     }
     $address->type = $type;
     $address->type_id = $type_id;
-    $address->block_no = $request->get($query.'address_building');
+    $address->building = $request->get($query.'address_building');
     $address->road_name = $request->get($query.'address_road_name');
     $address->landmark = $request->get($query.'address_landmark');
     $address->pincode = $request->get($query.'address_pincode');

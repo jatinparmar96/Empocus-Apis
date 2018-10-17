@@ -15,7 +15,7 @@ class CA_ContactsController extends Controller{
     public static function form(Request $request,$account_id)
     {
         $id = $request->get('contact_id');
-        if($id === null)
+        if($id === 'new')
         {
             $contact = new CA_Contact();
             $contact->created_by_id = TokenController::getUser()->id;
@@ -26,12 +26,12 @@ class CA_ContactsController extends Controller{
             $contact = CA_Contact::findOrFail($id);
         }
        
-        $contact->ca_contact_first_name  = $request->get('ca_first_name');
-        $contact->ca_contact_last_name = $request->get('ca_last_name');
-        $contact->ca_contact_mobile_number  = $request->get('ca_mobile_number');
-        $contact->ca_contact_email = $request->get('ca_email'); 
-        $contact->ca_contact_designation  = $request->get('ca_designation');
-        $contact->ca_contact_branch  = $request->get('ca_branch'); 
+        $contact->ca_contact_first_name  = $request->get('ca_contact_first_name');
+        $contact->ca_contact_last_name = $request->get('ca_contact_last_name');
+        $contact->ca_contact_mobile_number  = $request->get('ca_contact_mobile_number');
+        $contact->ca_contact_email = $request->get('ca_contact_email'); 
+        $contact->ca_contact_designation  = $request->get('ca_contact_designation');
+        $contact->ca_contact_branch  = $request->get('ca_contact_branch'); 
         $contact->updated_by_id = TokenController::getUser()->id;
         try
         {

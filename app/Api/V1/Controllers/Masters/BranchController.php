@@ -38,6 +38,7 @@ class BranchController extends Controller
             }
             else
             {
+
                 $message = 'New Branch created successfully!!';
                 $branch = new Branch();
                 $branch->company_id = $current_company_id;
