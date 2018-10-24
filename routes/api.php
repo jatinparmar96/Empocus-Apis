@@ -101,7 +101,9 @@ $api->version('v1', function (Router $api) {
             $api->get('product_category_full_list','App\\Api\\V1\\Controllers\\Masters\\ProductCategoryController@full_list');
             $api->get('product_category/{id}','App\\Api\\V1\\Controllers\\Masters\\ProductCategoryController@show');
             /* Company Operations */
-
+            
+            //BOM
+            $api->post('bom','App\\Api\\V1\\Controllers\\Masters\\BillOfMaterialMasterController@form');
 
 
     });

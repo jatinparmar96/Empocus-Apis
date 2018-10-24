@@ -28,7 +28,6 @@ class BranchController extends Controller
             $count = Branch::where('name',$request->get('branch_name'))
                             ->where('company_id',$current_company_id)
                             ->count();
-           
             if($count>0)
             {
               
@@ -47,15 +46,11 @@ class BranchController extends Controller
         }
         else
         {
-           
             $message = 'Branch updated successfully!!';
             $branch = Branch::findOrFail($id);
-
         }
         if($status)
         {
-          
-
             if($company_id !== 0)
             {
                 $branch->name = 'Head Office';
