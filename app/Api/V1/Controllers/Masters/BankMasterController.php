@@ -33,7 +33,7 @@ class BankMasterController extends Controller
             {  
                 $status = false;
                 $message = 'Kindly Fill up the form Correctly !!';
-                $error['bank']= 'Bank Name with Same account name already Exits';
+                $error['bank']= 'Bank Name with Same account name already Exits!!!';
             }
             else
             {
@@ -50,15 +50,18 @@ class BankMasterController extends Controller
         }
         if($status)
         {
-            if($type==='' && $type_id===0)
+            if($bank->type =='' && $bank->type_id =='')
             {
-                $bank->type='Not Defined';
-                $bank->type_id = $type_id;
-            }
-            else
-            {
-                $bank->type = $type;
-                $bank->type_id = $type_id;
+                if($type==='' && $type_id===0 )
+                {
+                    $bank->type='Not Defined';
+                    $bank->type_id = $type_id;
+                }
+                else
+                {
+                    $bank->type = $type;
+                    $bank->type_id = $type_id;
+                }
             }
             $bank->account_name = $request->get('account_name');
             $bank->bank_name = $request->get('bank_name');

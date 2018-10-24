@@ -14,21 +14,31 @@ use Illuminate\Support\Facades\DB;
 class RawProductController extends Controller
 {
     public function form(Request $request)
-    {
+    { 
         $status = true;
         $id = $request->get('id');
         $user = TokenController::getUser();
         $current_company_id = TokenController::getCompanyId();
+       
         if($id == 'new')
         {
-            $count = RawProduct::where('product_name',$request->get('raw_product_name'))
+            $count = RawProduct::where('product_name',$request->get('product_name'))
+                                ->where('company_id',$current_company_id)
+                                ->count();
+            $code = RawProduct::where('product_code',$request->get('product_code'))
                                 ->where('company_id',$current_company_id)
                                 ->count();
             if($count>0)
             {
                 $status = false;
                 $message = 'Please fill the form correctly!!!';
-                $error['product_name'] = 'Raw Product with this name Already Exists';
+                $error['product_name'] = 'Product with this name Already Exists!!';
+            }
+            if($code>0)
+            {
+                $status = false;
+                $message = 'Please fill the form correctly!!!';
+                $error['product_code'] = 'Product with this code Already Exists!!';
             }
             else
             {
@@ -115,8 +125,8 @@ class RawProductController extends Controller
                 )
                 ->addSelect(DB::raw('IF(rp.product_batch_type = 1,"Yes","No") as product_batch_type'))
                 ->addSelect(DB::raw('IF(rp.product_stock_ledger = 1,"Yes","No") as product_stock_ledger'))
-                ->addSelect('uom1.id as product_uom','uom1.unit_name')
-                ->addSelect('uom2.id as product_conv_uom','uom2.unit_name')
+                ->addSelect('uom1.id as product_uom','uom1.unit_name as product_uom_name')
+                ->addSelect('uom2.id as product_conv_uom','uom2.unit_name as product_conv_uom_name')
                 ->addSelect('t.id as product_gst_rate','t.tax_name','t.tax_rate')
                 ->addSelect('pc.id as product_category','pc.product_category_name')
                 ->where('rp.company_id',$current_company_id);
