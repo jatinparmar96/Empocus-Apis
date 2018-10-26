@@ -2,15 +2,13 @@
 
 namespace App\Api\V1\Controllers\Masters;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Input;
-use JWTAuth;
-use App\Model\Branch;
-use App\Model\Bank;
-use Illuminate\Support\Facades\DB;
-use App\Model\Address;
 use App\Api\V1\Controllers\Authentication\TokenController;
+use App\Http\Controllers\Controller;
+use App\Model\Bank;
+use App\Model\Branch;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use JWTAuth;
 
 class BranchController extends Controller
 {
