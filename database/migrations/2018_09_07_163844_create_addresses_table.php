@@ -17,7 +17,7 @@ class CreateAddressesTable extends Migration
             $table->increments('id');
             $table->string('type');
             $table->integer('type_id')->nullable();
-            $table->string('block_no')->nullable();
+            $table->string('building')->nullable();
             $table->string('road_name')->nullable();
             $table->string('landmark')->nullable();
             $table->string('country')->nullable();

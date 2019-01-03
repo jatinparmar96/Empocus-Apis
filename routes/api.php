@@ -86,6 +86,8 @@ $api->version('v1', function (Router $api) {
             $api->get('raw_product','App\\Api\\V1\\Controllers\\Masters\\RawProductController@index');
             $api->get('raw_product_full_list','App\\Api\\V1\\Controllers\\Masters\\RawProductController@full_list');
             $api->get('raw_product/{id}','App\\Api\\V1\\Controllers\\Masters\\RawProductController@show');
+            $api->get('raw_product_custom_list','App\\Api\\V1\\Controllers\\Masters\\RawProductController@getCustomProductsList');
+
             /* Attachment table*/
             $api->get('attachment', 'App\\Api\\V1\\Controllers\\AttachmentController@index');
             $api->post('attachment', 'App\\Api\\V1\\Controllers\\AttachmentController@store');
@@ -105,8 +107,37 @@ $api->version('v1', function (Router $api) {
             //BOM
             $api->post('bom','App\\Api\\V1\\Controllers\\Masters\\BillOfMaterialMasterController@form');
 
+            //CRM Features
+            $api->group( ['prefix'=> 'crm', 'middleware'=> 'jwt.auth'], function (Router $api) {
+                // Leads
+                $api->post('leads','App\\Api\\V1\\Controllers\\CRM\\LeadController@form');
+                $api->get('leads','App\\Api\\V1\\Controllers\\CRM\\LeadController@index');
+                $api->get('leads_full_list','App\\Api\\V1\\Controllers\\CRM\\LeadController@full_list');
+                $api->get('leads/{id}','App\\Api\\V1\\Controllers\\CRM\\LeadController@show');
 
-    });
+                // Appointment
+                $api->post('appointment','App\\Api\\V1\\Controllers\\CRM\\AppointmentController@form');
+                $api->get('appointment','App\\Api\\V1\\Controllers\\CRM\\AppointmentController@index');
+                $api->get('appointment_full_list','App\\Api\\V1\\Controllers\\CRM\\AppointmentController@full_list');
+                $api->get('appointment/{id}','App\\Api\\V1\\Controllers\\CRM\\AppointmentController@show');
+
+                // Account
+                $api->post('account','App\\Api\\V1\\Controllers\\CRM\\AccountController@form');
+                $api->get('account','App\\Api\\V1\\Controllers\\CRM\\AccountController@index');
+                $api->get('account_full_list','App\\Api\\V1\\Controllers\\CRM\\AccountController@full_list');
+                $api->get('account/{id}','App\\Api\\V1\\Controllers\\CRM\\AccountController@show');
+
+                //Contact
+                $api->post('contact','App\\Api\\V1\\Controllers\\CRM\\ContactController@form');
+                $api->get('contact','App\\Api\\V1\\Controllers\\CRM\\ContactController@index');
+                $api->get('contact_full_list','App\\Api\\V1\\Controllers\\CRM\\ContactController@full_list');
+                $api->get('contact/{id}','App\\Api\\V1\\Controllers\\CRM\\ContactController@show');
+
+                //Quotation
+                $api->post('quotation','App\\Api\\V1\\Controllers\\CRM\\QuotationController@form');
+            });
+
+        });
 
     $api->group( ['prefix'=> 'open'], function (Router $api) {
         $api->get('setting_by_option/app_version', 'App\\Api\\V1\\Controllers\\Authentication\\SettingController@app_version');

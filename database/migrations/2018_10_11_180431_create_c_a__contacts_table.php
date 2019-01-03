@@ -1,4 +1,4 @@
-<?php
+ <?php
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
@@ -20,6 +20,7 @@ class CreateCAContactsTable extends Migration
             $table->string('ca_contact_last_name');
             $table->string('ca_contact_email');
             $table->string('ca_contact_mobile_number');
+            $table->string('ca_contact_alternate_mobile_number');
             $table->string('ca_contact_designation');
             $table->string('ca_contact_branch');
             $table->timestamps();

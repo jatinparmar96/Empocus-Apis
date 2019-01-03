@@ -16,12 +16,12 @@ class CreateBillOfMaterialsTable extends Migration
         Schema::create('bill_of_materials', function (Blueprint $table) {
             $table->increments('id');
             $table->string('bom_name');
+            $table->integer('bom_uom');
             $table->string('item_name');
             $table->string('item_code');
             $table->integer('quantity');
             $table->integer('bom_number');
             $table->date('bom_date');
-            $table->foreign('bom_uom')->references('id')->on('unit_of_measurements');
             $table->timestamps();
         });
     }

@@ -1,0 +1,48 @@
+{
+  "id":"new",
+  "contacts": [
+    {
+      "contact_id": "new",
+      "first_name": "Jatin",
+      "last_name": "Parmar",
+      "email": "jatinparmar96@gmail.com",
+      "primary_contact_number": "9028605003",
+      "department": "Saphale"
+    },
+    {
+      "contact_id": "new",
+      "first_name": "Abc",
+      "last_name": "XYZ",
+      "email": "abcxyz@gmail.com",
+      "primary_contact_number": "87454874",
+      "department": "Saphale"
+    }
+  ],
+  "lead_status": "new",
+  "company_employee_number": "500",
+  "company_annual_revenue": "100000",
+  "company_website": "abc.com",
+  "company_phone": "5648971654",
+  "company_industry_type": "Abc",
+  "company_business_type": "Acb",
+  "twitter_link": "twitter.com/abc",
+  "facebook_link": "facebook.com/abc",
+  "linkedin_link": "linkedin.com/abc",
+  "deal_name": "Deal1",
+  "deal_value": "5000",
+  "deal_expected_close_date": "2018-11-26",
+  "deal_product": "2",
+  "source": "Email",
+  "campaign": "Email-Marketing",
+  "medium": "Emails",
+  "keyword": "marketing",
+  "lead_address_building": "Ali-Plaza",
+  "lead_address_road_name": "Station Ali Road",
+  "lead_address_landmark": "AliExpress",
+  "lead_address_country": "India",
+  "lead_address_city": "Mumbai",
+  "lead_address_state": "Maharashtra",
+  "company_name": "Abc",
+  "lead_address_pincode": "401102",
+  "address_id": "new"
+}

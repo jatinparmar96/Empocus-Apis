@@ -109,6 +109,10 @@ class CompanyController extends Controller
             'name' => $user['display_name'],
             'company_info'=>$company
 		];
+		if($user_payload['company_info'] === null)
+        {
+            dd($company);
+        }
 		try {
 			$token = JWTAuth::fromUser($user,$user_payload);
 			if(!$token) {
