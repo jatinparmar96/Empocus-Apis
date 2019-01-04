@@ -103,7 +103,7 @@ class LeadController extends Controller
                 'l.deal_value', 'l.deal_expected_close_date', 'l.deal_product', 'l.source', 'l.campaign', 'l.medium',
                 'l.keyword', 'l.created_by_id', 'l.updated_by_id')
             ->addSelect('u.display_name')
-            ->addSelect('rp.product_display_name','rp.id')
+            ->addSelect('rp.product_display_name','rp.id as product_id')
             ->where('l.company_id', '=', $company_id);
         return $query;
     }
@@ -120,6 +120,47 @@ class LeadController extends Controller
         }
 
         return $query;
+    }
+
+     public function globalSearch($query)
+    {
+        $search = \Request::get('search');
+        if (!empty($search)) {
+            $TableColumn = $this->globalTableColumn();
+            $query = $query->where('l.id',$search);
+            foreach ($TableColumn as $column) {
+                $query = $query->orWhere($column, 'LIKE', '%' . $search . '%');
+            }
+        }
+        return $query;
+    }
+
+    public function globalTableColumn()
+    {
+        $TableColumn = array(
+            "l.lead_status",
+            "l.longitude",
+            "l.latitude",
+            "l.company_email",
+            "l.company_employee_number",
+            "l.company_annual_revenue",
+            "l.company_website",
+            "l.company_phone",
+            "l.company_industry_type",
+            "l.company_business_type",
+            "l.twitter_link",
+            "l.facebook_link",
+            "l.linkedin_link",
+            "l.deal_name",
+            "l.deal_value",
+            "l.deal_expected_close_date",
+            "l.deal_product",
+            "l.source",
+            "l.campaign",
+            "l.medium",
+            "l.keyword",
+        );
+        return $TableColumn;
     }
 
     public function TableColumn()
@@ -167,7 +208,7 @@ class LeadController extends Controller
     public function full_list()
     {
         $query = $this->query();
-        $query = $this->search($query);
+        $query = $this->globalSearch($query);
         $query = $this->sort($query);
         $result = $query->get();
         return response()->json([
