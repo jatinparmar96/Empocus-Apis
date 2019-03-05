@@ -43,6 +43,7 @@ class AddressController extends Controller
     public static function get_address_by_type($id, $type)
     {
         $query = DB::table('addresses as a')
+            ->select('a.*','a.id as address_id')
             ->where('a.type_id', $id)
             ->where('type', $type)->get();
         return $query;

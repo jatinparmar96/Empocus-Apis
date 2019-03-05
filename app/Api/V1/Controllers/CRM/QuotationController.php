@@ -5,6 +5,7 @@ namespace App\Api\V1\Controllers\CRM;
 use App\Api\V1\Controllers\Authentication\TokenController;
 use App\Api\V1\Controllers\Masters\AddressController;
 use App\CRM_Models\Lead;
+use App\CRM_Models\Quotation;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -13,58 +14,49 @@ class QuotationController extends Controller
 {
     public function form(Request $request)
     {
-        return response()->json([
-            'data'=> $request->all()
-        ]);
+//        return response()->json([
+//            'data'=> $request->all()
+//        ]);
         $status = true;
         $id = $request->get('id');
         $user = TokenController::getUser();
         $current_company_id = TokenController::getCompanyId();
         if ($id === 'new') {
-            $lead = new Lead();
-            $lead->company_id = $current_company_id;
+            $quotation = new Quotation();
+            $quotation->company_id = $current_company_id;
             $message = 'Record Added Successfully';
-            $lead->created_by_id = $user->id;
+            $quotation->created_by_id = $user->id;
         } else {
             $message = 'Record Updated Successfully';
-            $lead = Lead::findOrFail($id);
+            $quotation = Quotation::findOrFail($id);
         }
         if ($status) {
-            $lead->first_name = $request->get('first_name');
-            $lead->last_name = $request->get('last_name');
-            $lead->email = $request->get('email');
-            $lead->primary_contact_number = $request->get('primary_contact_number');
-            $lead->department = $request->get('department');
-            $lead->lead_status = $request->get('lead_status');
-            $lead->company_name = $request->get('company_name');
-            $lead->company_employee_number = $request->get('company_employee_number');
-            $lead->company_annual_revenue = $request->get('company_annual_revenue');
-            $lead->company_website = $request->get('company_website');
-            $lead->company_phone = $request->get('company_phone');
-            $lead->company_industry_type = $request->get('company_industry_type');
-            $lead->company_business_type = $request->get('company_business_type');
-            $lead->twitter_link = $request->get('twitter_link');
-            $lead->facebook_link = $request->get('facebook_link');
-            $lead->linkedin_link = $request->get('linkedin_link');
-            $lead->deal_name = $request->get('deal_name');
-            $lead->deal_value = $request->get('deal_value');
-            $lead->deal_expected_close_date = $request->get('deal_expected_close_date');
-            $lead->deal_product = $request->get('deal_product');
-            $lead->source = $request->get('source');
-            $lead->campaign = $request->get('campaign');
-            $lead->medium = $request->get('medium');
-            $lead->keyword = $request->get('keyword');
-            $lead->updated_by_id = $user->id;
+            $quotation->customer_id = $request->get('customer_id');
+            $quotation->billing_address_id = $request->get('billing_address_id');
+            $quotation->quotation_date = $request->get('quotation_date');
+            $quotation->quotation_validity_date = $request->get('quotation_validity_date');
+            $quotation->delivery_address_id = $request->get('delivery_address_id');
+            $quotation->transporter_name = $request->get('transporter_name');
+            $quotation->e_way_bill_no = $request->get('e_way_bill_no');
+            $quotation->gross_amt = $request->get('gross_amt');
+            $quotation->discount_type = $request->get('discount_type');
+            $quotation->discount_value = $request->get('discount_value');
+            $quotation->total_amt = $request->get('total_amt');
+            $quotation->cgst_amt = $request->get('cgst_amt');
+            $quotation->sgst_amt = $request->get('sgst_amt');
+            $quotation->igst_amt = $request->get('igst_amt');
+            $quotation->delivery_charges = $request->get('delivery_charges');
+            $quotation->grand_total = $request->get('grand_total');
+            $quotation->updated_by_id = $user->id;
             try {
-                $lead->save();
-                AddressController::storeAddress($request, 'lead_', 'Lead', $lead->id);
+                $quotation->save();
             } catch (\Exception $e) {
                 $status = false;
                 $message = 'Something is wrong' . $e;
             }
             return response()->json([
                 'status' => $status,
-                'data' => $lead,
+                'data' => $quotation,
                 'message' => $message
             ]);
         } else {
@@ -85,7 +77,7 @@ class QuotationController extends Controller
         return response()->json([
             'status' => true,
             'status_code' => 200,
-            'message' => 'Leads List',
+            'message' => 'Quotation List',
             'data' => $result
         ]);
     }
@@ -93,17 +85,16 @@ class QuotationController extends Controller
     public function query()
     {
         $company_id = TokenController::getCompanyId();
-        $query = DB::table('leads as l')
-            ->leftJoin('users as u', 'l.created_by_id', 'u.id')
-            ->leftJoin('raw_products as rp', 'l.deal_product', 'rp.id')
-            ->select('l.id', 'l.first_name', 'l.last_name', 'l.email', 'l.company_name', 'l.primary_contact_number', 'l.department',
-                'l.lead_status', 'l.company_employee_number', 'l.company_annual_revenue', 'l.company_website',
-                'l.company_phone', 'l.company_industry_type', 'l.company_business_type', 'l.twitter_link', 'l.facebook_link',
-                'l.linkedin_link', 'l.deal_name', 'l.deal_value', 'l.deal_expected_close_date', 'l.deal_product', 'l.source',
-                'l.campaign', 'l.medium', 'l.keyword', 'l.created_by_id', 'l.updated_by_id')
-            ->addSelect('u.display_name')
-            ->addSelect('rp.product_display_name')
-            ->where('l.company_id', '=', $company_id);
+        $query = DB::table('quotations as q')
+            ->leftJoin('chart_of_accounts as c', 'q.customer_id','c.id')
+            ->leftJoin('addresses as a', 'q.billing_address_id', 'a.id')
+            ->leftJoin('addresses as bill_a','q.delivery_address_id','bill_a.id')
+            ->select('q.quotation_date','q.quotation_validity_date','q.transporter_name','q.e_way_bill_no','q.gross_amt',
+                'q.discount_type','q.discount_value','q.total_amt','q.cgst_amt','q.sgst_amt','q.igst_amt')
+            ->addSelect('c.ca_company_name as customer_name')
+            ->addSelect('a.city')
+            ->addSelect('')
+            ->where('q.company_id', '=', $company_id);
         return $query;
     }
 
@@ -161,7 +152,7 @@ class QuotationController extends Controller
             $TableColumn = $this->TableColumn();
             $query = $query->orderBy($TableColumn[key($sort)], $sort[key($sort)]);
         } else
-            $query = $query->orderBy('l.lead_status', 'ASC');
+            $query = $query->orderBy('l.id', 'ASC');
         return $query;
     }
 
@@ -174,7 +165,7 @@ class QuotationController extends Controller
         return response()->json([
             'status' => true,
             'status_code' => 200,
-            'message' => 'Leads Full List',
+            'message' => 'Quotation Full List',
             'data' => $result
         ]);
     }

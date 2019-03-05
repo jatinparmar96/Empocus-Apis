@@ -32,7 +32,7 @@ class LeadController extends Controller
             $lead->company_name = $request->get('company_name');
             $lead->longitude = $request->get('longitude');
             $lead->latitude = $request->get('latitude');
-            $lead->company_email = $request->get('email');
+            $lead->email = $request->get('email');
             $lead->company_employee_number = $request->get('company_employee_number');
             $lead->company_annual_revenue = $request->get('company_annual_revenue');
             $lead->company_website = $request->get('company_website');
@@ -50,6 +50,10 @@ class LeadController extends Controller
             $lead->campaign = $request->get('campaign');
             $lead->medium = $request->get('medium');
             $lead->keyword = $request->get('keyword');
+            if($request->get('image'))
+            {
+                $image = $request->get('image');
+            }
             $lead->updated_by_id = $user->id;
             try {
                  $lead->save();
@@ -80,7 +84,7 @@ class LeadController extends Controller
     {
         $limit = 10;
         $query = $this->query();
-        $query = $this->search($query);
+        $query = $this->globalSearch($query);
         $query = $this->sort($query);
         $result = $query->paginate($limit);
         return response()->json([
@@ -97,13 +101,13 @@ class LeadController extends Controller
         $query = DB::table('leads as l')
             ->leftJoin('users as u', 'l.created_by_id', 'u.id')
             ->leftJoin('raw_products as rp', 'l.deal_product', 'rp.id')
-            ->select('l.id', 'l.lead_status','l.company_name', 'l.company_employee_number', 'l.longitude','l.latitude',
-                'l.company_email','l.company_annual_revenue', 'l.company_website', 'l.company_phone', 'l.company_industry_type',
-                'l.company_business_type', 'l.twitter_link', 'l.facebook_link', 'l.linkedin_link', 'l.deal_name',
-                'l.deal_value', 'l.deal_expected_close_date', 'l.deal_product', 'l.source', 'l.campaign', 'l.medium',
-                'l.keyword', 'l.created_by_id', 'l.updated_by_id')
+            ->leftJoin('lead_statuses as l_status','l_status.id','l.lead_status')
+            ->select(
+                'l.id', 'l.lead_status','l.company_name', 'l.company_employee_number', 'l.longitude','l.latitude','l.email','l.company_annual_revenue', 'l.company_website', 'l.company_phone','l.company_industry_type','l.company_business_type', 'l.twitter_link', 'l.facebook_link', 'l.linkedin_link', 'l.deal_name','l.deal_value', 'l.deal_expected_close_date', 'l.deal_product', 'l.source', 'l.campaign', 'l.medium','l.keyword', 'l.created_by_id', 'l.updated_by_id'
+                )
             ->addSelect('u.display_name')
             ->addSelect('rp.product_display_name','rp.id as product_id')
+            ->addSelect('l_status.status as status')
             ->where('l.company_id', '=', $company_id);
         return $query;
     }
@@ -118,7 +122,6 @@ class LeadController extends Controller
                     $query = $query->Where($TableColumn[$key], 'LIKE', '%' . $searchvalue . '%');
             }
         }
-
         return $query;
     }
 
@@ -127,7 +130,7 @@ class LeadController extends Controller
         $search = \Request::get('search');
         if (!empty($search)) {
             $TableColumn = $this->globalTableColumn();
-            $query = $query->where('l.id',$search);
+            $query = $query->where('l.id','LIKE','%'.$search.'%');
             foreach ($TableColumn as $column) {
                 $query = $query->orWhere($column, 'LIKE', '%' . $search . '%');
             }
@@ -139,9 +142,10 @@ class LeadController extends Controller
     {
         $TableColumn = array(
             "l.lead_status",
+            "l.company_name", 
             "l.longitude",
             "l.latitude",
-            "l.company_email",
+            "l.email",
             "l.company_employee_number",
             "l.company_annual_revenue",
             "l.company_website",
@@ -170,7 +174,8 @@ class LeadController extends Controller
             "lead_status" => "l.lead_status",
             "longitude" => "l.longitude",
             "latitude" => "l.latitude",
-            "company_email" => "l.company_email",
+            "company_name"=>"l.company_name",
+            "email" => "l.email",
             "company_employee_number" => "l.company_employee_number",
             "company_annual_revenue" => "l.company_annual_revenue",
             "company_website" => "l.company_website",
@@ -208,7 +213,13 @@ class LeadController extends Controller
     public function full_list()
     {
         $query = $this->query();
-        $query = $this->globalSearch($query);
+       if(is_array(\Request::get('search')))
+       {
+           $query = $this->search($query);
+       }
+       else{
+           $query = $this->globalSearch($query);
+       }
         $query = $this->sort($query);
         $result = $query->get();
         return response()->json([

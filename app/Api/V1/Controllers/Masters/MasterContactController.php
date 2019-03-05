@@ -47,6 +47,7 @@ class MasterContactController extends Controller{
     public static function get_contacts_by_type($id,$type)
     {
         $query = DB::table('master_contacts as a')
+            ->select('a.id as contact_id','a.first_name','a.last_name','a.email','a.mobile_number','a.alternate_mobile_number','a.designation','a.branch')
             ->where('a.type_id', $id)
             ->where('a.type', $type)->get();
         return $query;

@@ -102,7 +102,7 @@ class ChartAccountsMaster extends Controller
         $current_company_id = TokenController::getCompanyId();
         $query = DB::table('chart_of_accounts as ca')
                     ->leftJoin('addresses as a','ca.id','a.type_id')
-                    ->leftJoin('ca_contacts as co','ca.id','co.ca_company_id')
+                    ->leftJoin('ca_contacts as co','ca.id','co.company_id')
                     ->select(
                     'ca.id','ca.ca_company_name','ca.ca_company_display_name','ca.ca_category','ca.ca_code','ca.ca_opening_amount','ca.ca_opening_type','ca.ca_website','ca.ca_pan','ca.ca_gstn','ca.ca_tan','ca.ca_date_opened'
                     )
@@ -201,9 +201,8 @@ class ChartAccountsMaster extends Controller
   public function show($id)
   {
       $query = $this->query();
-      $query = $this->search($query);
-      $query = $this->sort($query);
       $result = $query->where('ca.id',$id)->first();
+      $result->addresses = AddressController::get_address_by_type($id,'ChartOfAccounts');
       return response()->json([
               'status' => true,
               'status_code' => 200,

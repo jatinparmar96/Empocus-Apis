@@ -60,30 +60,28 @@ class AppointmentController extends Controller
     public function query()
     {
         $current_company = TokenController::getCompanyId();
-        $query = DB::table('accounts as ac')
-            ->select('ac.id','ac.account_name', 'ac.account_annual_revenue', 'ac.account_website', 'ac.account_phone',
-                'ac.account_industry_type', 'ac.account_business_type', 'ac.account_facebook_link', 'ac.account_twitter_link',
-                'ac.account_linkedin_link')
-            ->where('ac.company_id', $current_company);
-
+        $query = DB::table('appointments as ap')
+            ->select('ap.id','ap.title','ap.start_date','ap.start_time','ap.end_date','ap.end_time','ap.outcome','ap.location','ap.latitude','ap.longitude','ap.description')
+            ->where('ap.company_id', $current_company);
         return $query;
     }
 
     public function TableColumn()
     {
         $TableColumn = array(
-            "id" => "ac.id",
-            "account_name" => "ac.account_name",
-            "account_annual_revenue" => "ac.account_annual_revenue",
-            "account_website" => "ac.account_website",
-            "account_phone" => "ac.account_phone",
-            "account_industry_type" => "ac.account_industry_type",
-            "account_business_type" => "ac.account_business_type",
-            "account_facebook_link" => "ac.account_facebook_link",
-            "account_twitter_link" => "ac.account_twitter_link",
-            "account_linkedin_link" => "ac.account_linkedin_link",
-            "created_by_id" => "ac.created_by_id",
-            "updated_by_id" => "ac.updated_by_id",
+            "id" => "ap.id",
+            "title" => "ap.title",
+            "start_date	" => "ap.start_date",
+            "start_time" => "ap.start_time",
+            "end_date" => "ap.end_date",
+            "end_time	" => "ap.end_time",
+            "outcome" => "ap.outcome",
+            "location" => "ap.location",
+            "latitude" => "ap.latitude",
+            "longitude" => "ap.longitude",
+            "description" => "ap.description",
+            "created_by_id" => "ap.created_by_id",
+            "updated_by_id" => "ap.updated_by_id",
         );
         return $TableColumn;
     }
@@ -95,7 +93,7 @@ class AppointmentController extends Controller
             $TableColumn = $this->TableColumn();
             $query = $query->orderBy($TableColumn[key($sort)], $sort[key($sort)]);
         } else
-            $query = $query->orderBy('ac.account_name', 'ASC');
+            $query = $query->orderBy('ap.title', 'ASC');
         return $query;
     }
 
@@ -148,7 +146,7 @@ class AppointmentController extends Controller
         $query = $this->query();
         $query = $this->search($query);
         $query = $this->sort($query);
-        $result = $query->where('ac.id', $id)->get();
+        $result = $query->where('ap.id', $id)->get();
         return response()->json([
             'status' => true,
             'status_code' => 200,

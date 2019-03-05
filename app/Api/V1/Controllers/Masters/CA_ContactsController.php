@@ -19,7 +19,7 @@ class CA_ContactsController extends Controller{
         {
             $contact = new CA_Contact();
             $contact->created_by_id = TokenController::getUser()->id;
-            $contact->ca_company_id= $account_id;
+            $contact->company_id= $account_id;
         }
         else
         {

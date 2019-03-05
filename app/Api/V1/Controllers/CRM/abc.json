@@ -1,27 +1,32 @@
 {
-  "id":"new",
+  "id":30,
   "contacts": [
     {
-      "contact_id": "new",
-      "first_name": "Jatin",
-      "last_name": "Parmar",
-      "email": "jatinparmar96@gmail.com",
-      "primary_contact_number": "9028605003",
-      "department": "Saphale"
+      "contact_id": 31,
+      "first_name": "Karen",
+      "last_name": "Lyod",
+      "email": "change1@gmail.com",
+      "mobile_number": "9028605003",
+      "alternate_mobile_number":"79842134654",
+      "branch": "NY"
     },
     {
-      "contact_id": "new",
-      "first_name": "Abc",
-      "last_name": "XYZ",
-      "email": "abcxyz@gmail.com",
-      "primary_contact_number": "87454874",
-      "department": "Saphale"
+      "contact_id": 33,
+      "first_name": "Jatin",
+      "last_name": "Parmar",
+      "email": "now21@gmail.com",
+      "mobile_number": "87454874",
+      "alternate_mobile_number":"09028604032",
+      "branch": "Virar"
     }
   ],
-  "lead_status": "new",
+  "lead_status": 1,
+  "latitude":"4.102232131",
+  "longitude":"3.124548441",
+  "email":"info@clarusinfo.com",
   "company_employee_number": "500",
   "company_annual_revenue": "100000",
-  "company_website": "abc.com",
+  "company_website": "hehehehe.com",
   "company_phone": "5648971654",
   "company_industry_type": "Abc",
   "company_business_type": "Acb",
@@ -36,13 +41,13 @@
   "campaign": "Email-Marketing",
   "medium": "Emails",
   "keyword": "marketing",
-  "lead_address_building": "Ali-Plaza",
-  "lead_address_road_name": "Station Ali Road",
-  "lead_address_landmark": "AliExpress",
-  "lead_address_country": "India",
-  "lead_address_city": "Mumbai",
-  "lead_address_state": "Maharashtra",
-  "company_name": "Abc",
+  "lead_address_building": "Ali-Plaza-4",
+  "lead_address_road_name": "Station Ali Road-4",
+  "lead_address_landmark": "AliExpress-4",
+  "lead_address_country": "India-4",
+  "lead_address_city": "Mumbai-4",
+  "lead_address_state": "Maharashtra-4",
+  "company_name": "Bitman",
   "lead_address_pincode": "401102",
-  "address_id": "new"
+  "address_id": 40
 }

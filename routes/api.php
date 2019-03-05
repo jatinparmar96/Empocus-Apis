@@ -44,7 +44,7 @@ $api->version('v1', function (Router $api) {
 
     $api->group( ['prefix'=> 'admin', 'middleware'=> 'jwt.auth'], function (Router $api) {
 
-
+        $api->get('app_version','App\\Api\\V1\\Controllers\\Masters\\VersionController@get_version');
             /* Companies table*/
             $api->post('company', 'App\\Api\\V1\\Controllers\\Masters\\CompanyController@store');
             $api->post('company_other_details','App\\Api\\V1\\Controllers\\Masters\\CompanyController@storeOtherDetails');
@@ -114,7 +114,7 @@ $api->version('v1', function (Router $api) {
                 $api->get('leads','App\\Api\\V1\\Controllers\\CRM\\LeadController@index');
                 $api->get('leads_full_list','App\\Api\\V1\\Controllers\\CRM\\LeadController@full_list');
                 $api->get('leads/{id}','App\\Api\\V1\\Controllers\\CRM\\LeadController@show');
-
+                $api->get('lead_status_full_list','App\\Api\\V1\\Controllers\\Masters\\LeadStatusMasterController@full_list');
                 // Appointment
                 $api->post('appointment','App\\Api\\V1\\Controllers\\CRM\\AppointmentController@form');
                 $api->get('appointment','App\\Api\\V1\\Controllers\\CRM\\AppointmentController@index');
@@ -135,6 +135,13 @@ $api->version('v1', function (Router $api) {
 
                 //Quotation
                 $api->post('quotation','App\\Api\\V1\\Controllers\\CRM\\QuotationController@form');
+                $api->get('quotation_full_list','App\\Api\\V1\\Controllers\\CRM\\QuotationController@full_list');
+
+                //Task
+                $api->post('task','App\\Api\\V1\\Controllers\\CRM\\TaskController@form');
+                $api->get('task','App\\Api\\V1\\Controllers\\CRM\\TaskController@index');
+                $api->get('task_full_list','App\\Api\\V1\\Controllers\\CRM\\TaskController@full_list');
+                $api->get('task/{id}','App\\Api\\V1\\Controllers\\CRM\\TaskController@show');
             });
 
         });

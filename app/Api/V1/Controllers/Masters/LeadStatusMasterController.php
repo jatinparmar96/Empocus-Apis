@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Api\V1\Controllers\CRM;
+namespace App\Api\V1\Controllers\Masters;
 
 use App\Api\V1\Controllers\Authentication\TokenController;
-use App\CRM_Models\Task;
 use App\Http\Controllers\Controller;
+use App\Model\LeadStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Input;
 
-class TaskController extends Controller
+class LeadStatusMasterController extends Controller
 {
     public function form(Request $request)
     {
@@ -17,41 +18,47 @@ class TaskController extends Controller
         $user = TokenController::getUser();
         $current_company_id = TokenController::getCompanyId();
         if ($id === 'new') {
-            $task = new Task();
-            $task->company_id = $current_company_id;
-            $message = 'Record Added Successfully';
-            $task->created_by_id = $user->id;
-            $status = true;
+            $count = LeadStatus::Where('unit_name', Input::get('unit_name'))
+                ->Where('company_id', $current_company_id)
+                ->count();
+            if ($count > 0) {
+                $status = false;
+                $message = 'Kindly fill up form Correctly !!';
+                $error['unit_name'] = 'Name already exist !!';
+            } else {
+                $message = 'Record Added Successfully';
+                $l_status = new LeadStatus();
+                $l_status->created_by_id = $user->id;
+            }
         } else {
             $message = 'Record Updated Successfully';
-            $task = Task::findOrFail($id);
+            $l_status = LeadStatus::findOrFail($id);
         }
+
         if ($status) {
-            $task->title = $request->get('title');
-            $task->due_date = $request->get('due_date');
-            $task->due_time = $request->get('due_time');
-            $task->task_type = $request->get('task_type');
-            $task->outcome = $request->get('outcome');
-            $task->description = $request->get('description');
-            $task->contact_id = $request->get('contact_id');
-            $task->updated_by_id = $user->id;
+            $l_status->company_id = $current_company_id;
+            $l_status->status = Input::get('lead_status');
+            $l_status->updated_by_id = $user->id;
             try {
-                $task->save();
+                $l_status->save();
             } catch (\Exception $e) {
                 $status = false;
-                $message = 'Something is wrong' . $e;
+                $message = 'Something is wrong. Kindly Contact Admin';
             }
+
             return response()->json([
                 'status' => $status,
-                'data' => $task,
+                'data' => $l_status,
                 'message' => $message
             ]);
         } else {
             return response()->json([
                 'status' => $status,
                 'message' => $message,
+                'error' => $error,
             ]);
         }
+
     }
 
     public function index()
@@ -64,18 +71,17 @@ class TaskController extends Controller
         return response()->json([
             'status' => true,
             'status_code' => 200,
-            'message' => 'Task List',
+            'message' => 'Lead Status List',
             'data' => $result
         ]);
     }
 
     public function query()
     {
-        $current_company = TokenController::getCompanyId();
-        $query = DB::table('crm_tasks as t')
-            ->select('t.title', 't.due_date', 't.due_time', 't.task_type', 't.outcome', 't.description')
-            ->where('t.company_id', $current_company);
-
+        $current_company_id = TokenController::getCompanyId();
+        $query = DB::table('lead_statuses as l_status')
+            ->select('l_status.id', 'l_status.status')
+            ->where('l_status.company_id', $current_company_id);
         return $query;
     }
 
@@ -96,17 +102,13 @@ class TaskController extends Controller
     public function TableColumn()
     {
         $TableColumn = array(
-            "id" => "t.id",
-            "title" => "t.title",
-            "due_date" => "t.due_date",
-            "due_time" => "t.due_time",
-            "task_type" => "t.task_type",
-            "outcome" => "t.outcome",
-            "description" => "t.description"
+            "id" => "l_status.id",
+            "status" => "l_status.status",
+            "is_active" => "l_status.is_active"
         );
         return $TableColumn;
     }
-
+    
     //use Helpers;
 
     public function sort($query)
@@ -116,35 +118,36 @@ class TaskController extends Controller
             $TableColumn = $this->TableColumn();
             $query = $query->orderBy($TableColumn[key($sort)], $sort[key($sort)]);
         } else
-            $query = $query->orderBy('t.title', 'ASC');
+            $query = $query->orderBy('l_status.id', 'ASC');
+
         return $query;
     }
-
+    
     public function full_list()
     {
         $query = $this->query();
         $query = $this->search($query);
         $query = $this->sort($query);
+        $query = $query->Where('l_status.is_active', true);
         $result = $query->get();
         return response()->json([
             'status' => true,
             'status_code' => 200,
-            'message' => 'Task Full List',
+            'message' => 'Lead Status Full List',
             'data' => $result
         ]);
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $query = $this->query();
-        $query = $this->search($query);
-        $query = $this->sort($query);
-        $result = $query->where('t.id', $id)->get();
+        $result = $query->Where('uom.id', $id)->first();
         return response()->json([
             'status' => true,
             'status_code' => 200,
-            'message' => 'Task Show List',
+            'message' => 'UOM',
             'data' => $result
         ]);
     }
+
 }
