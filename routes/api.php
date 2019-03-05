@@ -142,6 +142,12 @@ $api->version('v1', function (Router $api) {
                 $api->get('task','App\\Api\\V1\\Controllers\\CRM\\TaskController@index');
                 $api->get('task_full_list','App\\Api\\V1\\Controllers\\CRM\\TaskController@full_list');
                 $api->get('task/{id}','App\\Api\\V1\\Controllers\\CRM\\TaskController@show');
+
+                //Deal
+                $api->post('deal','App\\Api\\V1\\Controllers\\CRM\\DealController@form');
+                $api->get('deal','App\\Api\\V1\\Controllers\\CRM\\DealController@index');
+                $api->get('deal_full_list','App\\Api\\V1\\Controllers\\CRM\\DealController@full_list');
+                $api->get('deal/{id}','App\\Api\\V1\\Controllers\\CRM\\DealController@show');
             });
 
         });
