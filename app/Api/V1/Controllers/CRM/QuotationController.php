@@ -4,23 +4,22 @@ namespace App\Api\V1\Controllers\CRM;
 
 use App\Api\V1\Controllers\Authentication\TokenController;
 use App\Api\V1\Controllers\Masters\AddressController;
-use App\CRM_Models\Lead;
+use App\Api\V1\Controllers\CRM\QuotationProductsController;
 use App\CRM_Models\Quotation;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+
 class QuotationController extends Controller
 {
     public function form(Request $request)
-    {
-//        return response()->json([
-//            'data'=> $request->all()
-//        ]);
+    {       
         $status = true;
         $id = $request->get('id');
         $user = TokenController::getUser();
         $current_company_id = TokenController::getCompanyId();
+        DB::beginTransaction();
         if ($id === 'new') {
             $quotation = new Quotation();
             $quotation->company_id = $current_company_id;
@@ -50,10 +49,17 @@ class QuotationController extends Controller
             $quotation->updated_by_id = $user->id;
             try {
                 $quotation->save();
+                $quotationProduct = new QuotationProductsController();
+                foreach($request->products as $product)
+                {
+                    $quotationProduct->store($product);
+                }
             } catch (\Exception $e) {
+                DB::rollback();
                 $status = false;
                 $message = 'Something is wrong' . $e;
             }
+            DB::commit();
             return response()->json([
                 'status' => $status,
                 'data' => $quotation,
