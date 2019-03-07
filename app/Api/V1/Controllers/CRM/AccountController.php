@@ -154,7 +154,7 @@ class AccountController extends Controller
         $query = $this->query();
         $query = $this->search($query);
         $query = $this->sort($query);
-        $result = $query->where('a.id', $id)->get();
+        $result = $query->where('a.id', $id)->first();
         return response()->json([
             'status' => true,
             'status_code' => 200,

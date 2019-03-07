@@ -15,6 +15,14 @@ class CreateQuotationProductsTable extends Migration
     {
         Schema::create('quotation_products', function (Blueprint $table) {
             $table->increments('id');
+
+            $table->integer('product_id')->references('id')->on('raw_product');
+            
+            $table->double('quantity');
+            $table->double('rate');
+            $table->double('gst');
+            $table->double('total');
+
             $table->timestamps();
         });
     }

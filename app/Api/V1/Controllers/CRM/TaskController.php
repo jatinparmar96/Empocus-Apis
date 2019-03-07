@@ -139,7 +139,7 @@ class TaskController extends Controller
         $query = $this->query();
         $query = $this->search($query);
         $query = $this->sort($query);
-        $result = $query->where('t.id', $id)->get();
+        $result = $query->where('t.id', $id)->first();
         return response()->json([
             'status' => true,
             'status_code' => 200,

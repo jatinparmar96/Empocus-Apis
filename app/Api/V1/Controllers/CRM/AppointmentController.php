@@ -146,7 +146,7 @@ class AppointmentController extends Controller
         $query = $this->query();
         $query = $this->search($query);
         $query = $this->sort($query);
-        $result = $query->where('ap.id', $id)->get();
+        $result = $query->where('ap.id', $id)->first();
         return response()->json([
             'status' => true,
             'status_code' => 200,

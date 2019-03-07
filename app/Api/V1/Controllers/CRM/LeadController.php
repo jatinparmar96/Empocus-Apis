@@ -232,7 +232,7 @@ class LeadController extends Controller
 
     public function show($id)
     {
-        $data['lead'] = $this->query()->where('l.id', $id)->get();
+        $data['lead'] = $this->query()->where('l.id', $id)->first();
         $data['lead_addresses'] = AddressController::get_address_by_type($id, 'Lead');
         $data['contacts'] = MasterContactController::get_contacts_by_type($id, 'Lead');
         return response()->json([

@@ -31,19 +31,19 @@ class QuotationController extends Controller
         }
         if ($status) {
             $quotation->customer_id = $request->get('customer_id');
-            $quotation->billing_address_id = $request->get('billing_address_id');
-            $quotation->quotation_date = $request->get('quotation_date');
-            $quotation->quotation_validity_date = $request->get('quotation_validity_date');
-            $quotation->delivery_address_id = $request->get('delivery_address_id');
+            $quotation->address_id = $request->get('address_id');
+            $quotation->date = $request->get('date');
+            $quotation->validity_date = $request->get('validity_date');
+            $quotation->delivery_at = $request->get('delivery_at');
             $quotation->transporter_name = $request->get('transporter_name');
-            $quotation->e_way_bill_no = $request->get('e_way_bill_no');
-            $quotation->gross_amt = $request->get('gross_amt');
+            $quotation->eway_bill_number = $request->get('eway_bill_number');
+            $quotation->gross_amount = $request->get('gross_amount');
             $quotation->discount_type = $request->get('discount_type');
-            $quotation->discount_value = $request->get('discount_value');
-            $quotation->total_amt = $request->get('total_amt');
-            $quotation->cgst_amt = $request->get('cgst_amt');
-            $quotation->sgst_amt = $request->get('sgst_amt');
-            $quotation->igst_amt = $request->get('igst_amt');
+            $quotation->discount = $request->get('discount');
+            $quotation->total = $request->get('total');
+            $quotation->cgst = $request->get('cgst');
+            $quotation->sgst = $request->get('sgst');
+            $quotation->igst = $request->get('igst');
             $quotation->delivery_charges = $request->get('delivery_charges');
             $quotation->grand_total = $request->get('grand_total');
             $quotation->updated_by_id = $user->id;
